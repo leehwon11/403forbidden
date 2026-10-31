@@ -1,5 +1,5 @@
 /* =========================================================
-   모해인 × 현도훈 · 403 Forbidden — 공용 스타일
+   현도훈 × 모해인 · 403 Forbidden — 공용 스타일
    색을 바꾸고 싶으면 아래 :root 의 값만 고치면 전체에 적용돼요.
    ========================================================= */
 :root {
@@ -22,6 +22,7 @@
   --serif: 'Gowun Batang', 'Nanum Myeongjo', serif;
 }
 
+[hidden] { display: none !important; }
 * { box-sizing: border-box; }
 html, body { margin: 0; }
 body {
@@ -147,6 +148,11 @@ button, input { font-family: inherit; }
 .boot-line--alert { color: #ff8a80; }
 .boot-cursor { width: 10px; height: 18px; background: #d8dde3; animation: blink 1s steps(1) infinite; }
 .boot-skip { position: absolute; right: 24px; bottom: 24px; min-height: 44px; padding: 0 16px; background: transparent; color: #aab2bc; border: 1px solid #4a525c; font-size: 13px; cursor: pointer; }
+.boot-scanline { position: fixed; inset: 0; background: repeating-linear-gradient(0deg, transparent 0, transparent 2px, rgba(0,0,0,0.06) 2px, rgba(0,0,0,0.06) 4px); pointer-events: none; z-index: 1; }
+.boot-progress { width: min(280px, 70%); height: 10px; border: 1px solid #4a525c; margin-top: 20px; }
+.boot-bar { height: 100%; background: #6b8f71; width: 0; transition: width 0.3s ease-out; }
+@keyframes crt { 0%,88%,100% { opacity: 1; } 89% { opacity: .82; } 91% { opacity: 1; } 94% { opacity: .88; } }
+.boot:not([hidden]) { animation: crt 5s ease infinite; }
 .sysline { font-family: var(--pixel); font-size: 13px; color: #1f2833; letter-spacing: 1px; }
 .alert { width: 100%; max-width: 580px; }
 .alert-body { padding: 28px 26px; display: flex; gap: 22px; align-items: flex-start; }
