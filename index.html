@@ -449,9 +449,48 @@
   });
 
   document.getElementById('btn-wait').addEventListener('click', function () {
-    setOpen(true);
-    replay(document.getElementById('flash'), 'is-on');
-    document.getElementById('btn-enter').focus();
+    var self = this;
+    self.disabled = true;
+    document.getElementById('btn-retry').disabled = true;
+    self.textContent = '[처리 중...]';
+
+    var steps = [
+      { text: '[조건을 재검토합니다...]', wait: 600 },
+      { text: '[권한 데이터를 다시 조회합니다...]', wait: 700 },
+      { text: '[현도훈 — 권한 재확인... 유효]', wait: 500 },
+      { text: '[모해인 — 권한 재확인... 유효]', wait: 500 },
+      { text: '[관계 상태를 동기화합니다...]', wait: 800 },
+      { text: '[때 — 조건 충족 여부 판정 중...]', wait: 900 },
+      { text: '[102 PROCESSING — 요청을 처리하고 있습니다.]', wait: 700 },
+      { text: '[조건이 충족되었습니다: 때]', wait: 600 }
+    ];
+
+    var idx = 0;
+    function nextStep() {
+      if (idx >= steps.length) {
+        alertLines.innerHTML += '<div style="color:var(--green);font-weight:700">[200 OK — 접근이 허용되었습니다.]</div>';
+        sfx('open');
+        setTimeout(function () {
+          setOpen(true);
+          replay(document.getElementById('flash'), 'is-on');
+          replay(alertWin, 'pop');
+          document.getElementById('btn-enter').focus();
+        }, 400);
+        return;
+      }
+      var step = steps[idx];
+      var line = document.createElement('div');
+      line.style.color = 'var(--muted)';
+      line.style.fontSize = '12px';
+      line.textContent = step.text;
+      alertLines.appendChild(line);
+      sfx('click');
+      idx++;
+      setTimeout(nextStep, step.wait);
+    }
+
+    alertLines.innerHTML = '';
+    setTimeout(nextStep, 300);
   });
 
   document.getElementById('btn-enter').addEventListener('click', function () {
@@ -869,9 +908,7 @@
     function render() {
       tabs.innerHTML = CHARACTERS.map(function (x, i) {
         return '<button type="button" class="tab" data-i="' + i + '" aria-pressed="' + (i === cur) + '">' + esc(x.name) + '</button>';
-      }).join('') +
-      '<button type="button" class="tab" data-action="stat" style="margin-left:auto;font-size:11px">상태창</button>' +
-      '<button type="button" class="tab" data-action="idcard" style="font-size:11px">등록증</button>';
+      }).join('');
       var c = CHARACTERS[cur];
       wiki.innerHTML =
         "<div class=\"wiki-loaded\">[‘" + esc(c.name) + "’ 의 등록 정보를 불러왔습니다.]</div>" +
@@ -881,6 +918,10 @@
             '<div class="statbox-head"><strong>' + esc(c.name) + '</strong><small>' + esc(c.tag) + '</small></div>' +
             '<dl class="stats">' + c.rows.map(function (r) { return '<dt>' + esc(r[0]) + '</dt><dd>' + esc(r[1]) + '</dd>'; }).join('') + '</dl>' +
           '</div>' +
+        '</div>' +
+        '<div class="wiki-actions" style="display:flex;gap:8px;margin:12px 0">' +
+          '<button type="button" class="btn btn--flat" data-action="stat" style="font-family:var(--pixel);font-size:11px;letter-spacing:1px">[STATUS WINDOW]</button>' +
+          '<button type="button" class="btn btn--flat" data-action="idcard" style="font-family:var(--pixel);font-size:11px;letter-spacing:1px">[REGISTRATION CARD]</button>' +
         '</div>' +
         '<div class="wiki-cols">' +
           '<section class="panel"><h2>[보유 특성]</h2><div>' + esc(c.traits) + '</div></section>' +
@@ -1073,32 +1114,57 @@
     } catch (e) {}
   }
 
-  /* ======== 드래그 가능 창 ======== */
+  /* ======== 드래그 가능 창 (마우스 + 터치) ======== */
   (function () {
     var dragging = null, offX = 0, offY = 0;
-    document.addEventListener('mousedown', function (e) {
-      var bar = e.target.closest('.win-bar');
-      if (!bar || e.target.closest('a') || e.target.closest('button')) return;
+
+    function startDrag(bar, clientX, clientY) {
+      if (bar.closest('a') || bar.closest('button')) return false;
       var win = bar.closest('.win');
-      if (!win) return;
+      if (!win) return false;
       dragging = win;
       var rect = win.getBoundingClientRect();
-      offX = e.clientX - rect.left;
-      offY = e.clientY - rect.top;
+      offX = clientX - rect.left;
+      offY = clientY - rect.top;
       win.classList.add('is-dragging');
       if (!win.style.position || win.style.position === 'static') {
         win.style.position = 'relative';
       }
-      e.preventDefault();
-    });
-    document.addEventListener('mousemove', function (e) {
+      return true;
+    }
+
+    function moveDrag(clientX, clientY) {
       if (!dragging) return;
-      dragging.style.left = (e.clientX - offX - dragging.parentElement.getBoundingClientRect().left) + 'px';
-      dragging.style.top = (e.clientY - offY - dragging.parentElement.getBoundingClientRect().top) + 'px';
-    });
-    document.addEventListener('mouseup', function () {
+      var pRect = dragging.parentElement.getBoundingClientRect();
+      dragging.style.left = (clientX - offX - pRect.left) + 'px';
+      dragging.style.top = (clientY - offY - pRect.top) + 'px';
+    }
+
+    function endDrag() {
       if (dragging) { dragging.classList.remove('is-dragging'); dragging = null; }
+    }
+
+    document.addEventListener('mousedown', function (e) {
+      var bar = e.target.closest('.win-bar');
+      if (bar && startDrag(bar, e.clientX, e.clientY)) e.preventDefault();
     });
+    document.addEventListener('mousemove', function (e) { moveDrag(e.clientX, e.clientY); });
+    document.addEventListener('mouseup', endDrag);
+
+    document.addEventListener('touchstart', function (e) {
+      var bar = e.target.closest('.win-bar');
+      if (!bar) return;
+      var t = e.touches[0];
+      if (startDrag(bar, t.clientX, t.clientY)) e.preventDefault();
+    }, { passive: false });
+    document.addEventListener('touchmove', function (e) {
+      if (!dragging) return;
+      var t = e.touches[0];
+      moveDrag(t.clientX, t.clientY);
+      e.preventDefault();
+    }, { passive: false });
+    document.addEventListener('touchend', endDrag);
+    document.addEventListener('touchcancel', endDrag);
   })();
 
   /* ======== 터미널 (이스터에그) ======== */
