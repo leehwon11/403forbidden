@@ -65,7 +65,12 @@ const CHARACTERS = [
     ],
     traits: '[특성 1]\n[특성 2]\n[특성 3]',
     relation: '[관계 메모]',
-    memo: '[도훈 소개 — 외형 / 성격 / 배경]'
+    appearance: '[외형 — 키, 인상, 옷차림 등]',
+    personality: '[성격 — 말투, 습관, 가치관 등]',
+    background: '[배경 — 과거, 현재 상황 등]',
+    likes: ['[ ]', '[ ]'],
+    dislikes: ['[ ]', '[ ]'],
+    spoiler: '[스포일러 내용 — 열람 확인 후 표시됨]'
   },
   {
     id: 'haein',
@@ -85,7 +90,12 @@ const CHARACTERS = [
     ],
     traits: '[특성 1]\n[특성 2]\n[특성 3]',
     relation: '[관계 메모]',
-    memo: '[해인 소개 — 원작 설정은 스포일러 표기와 함께 직접 작성]'
+    appearance: '[외형]',
+    personality: '[성격]',
+    background: '[배경]',
+    likes: ['[ ]', '[ ]'],
+    dislikes: ['[ ]', '[ ]'],
+    spoiler: '[스포일러 내용]'
   }
 ];
 

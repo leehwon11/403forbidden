@@ -172,6 +172,8 @@ function sp(path,val){
 }
 
 function inp(p,ph){var v=gp(p);return '<input data-p="'+p+'" value="'+esc(v==null?'':v)+'" placeholder="'+esc(ph||'')+'">';}
+function imgInp(p,ph){var v=gp(p);return '<div style="display:flex;gap:4px"><input data-p="'+p+'" value="'+esc(v==null?'':v)+'" placeholder="'+esc(ph||'')+'" style="flex:1">'+
+  (adm?'<button type="button" class="btn btn--flat" data-action="upload" data-target="'+p+'" style="font-size:11px;padding:2px 8px;white-space:nowrap">업로드</button>':'')+'</div>';}
 function area(p,ph,r){var v=gp(p);return '<textarea data-p="'+p+'" rows="'+(r||3)+'" placeholder="'+esc(ph||'')+'">'+esc(v==null?'':v)+'</textarea>';}
 function sel(p,opts){var v=gp(p);return '<select data-p="'+p+'">'+opts.map(function(o){
   var val=typeof o==='string'?o:o[0],lb=typeof o==='string'?o:o[1];
@@ -206,7 +208,7 @@ function rChars(){
       '<div class="adm-card-head"><span class="adm-card-title">#'+(ci+1)+' '+esc(c.name)+' ('+esc(c.tag)+')</span></div>'+
       '<div class="adm-pair">'+rw('ID',inp(p+'.id','id'))+rw('이름',inp(p+'.name','이름'))+'</div>'+
       '<div class="adm-pair">'+rw('TAG',inp(p+'.tag','DREAM / ORIGINAL'))+rw('상대',inp(p+'.other','상대 이름'))+'</div>'+
-      '<div class="adm-pair">'+rw('FACE (얼굴 이미지)',inp(p+'.face','assets/img/...'))+rw('PORTRAIT (초상 이미지)',inp(p+'.portrait','assets/img/...'))+'</div>'+
+      '<div class="adm-pair">'+rw('FACE (얼굴 이미지)',imgInp(p+'.face','assets/img/...'))+rw('PORTRAIT (초상 이미지)',imgInp(p+'.portrait','assets/img/...'))+'</div>'+
       '<div class="adm-sec">정보 행</div>'+
       c.rows.map(function(r,ri){
         return '<div class="adm-pair" style="margin-bottom:4px">'+
@@ -217,14 +219,32 @@ function rChars(){
       '<button type="button" class="adm-add" data-action="add-row" data-ci="'+ci+'" style="margin:8px 0">+ 정보 행 추가</button>'+
       rw('특성 (줄바꿈으로 구분)',area(p+'.traits','특성 1\n특성 2',3))+
       rw('관계 메모',area(p+'.relation','관계 메모',3))+
-      rw('개요',area(p+'.memo','캐릭터 소개',5))+
+      '<div class="adm-sec">세부 프로필</div>'+
+      rw('외형',area(p+'.appearance','키, 인상, 옷차림 등',3))+
+      rw('성격',area(p+'.personality','말투, 습관, 가치관 등',3))+
+      rw('배경',area(p+'.background','과거, 현재 상황 등',3))+
+      '<div class="adm-sec">좋아하는 것</div>'+
+      (c.likes||[]).map(function(l,li){
+        return '<div class="adm-inline"><input data-p="'+p+'.likes.'+li+'" value="'+esc(l)+'" placeholder="항목 '+(li+1)+'">'+
+          '<button type="button" class="adm-rm" data-action="rm-like" data-ci="'+ci+'" data-li="'+li+'">X</button></div>';
+      }).join('')+
+      '<button type="button" class="adm-add" data-action="add-like" data-ci="'+ci+'" style="margin:4px 0">+ 추가</button>'+
+      '<div class="adm-sec">싫어하는 것</div>'+
+      (c.dislikes||[]).map(function(d,di){
+        return '<div class="adm-inline"><input data-p="'+p+'.dislikes.'+di+'" value="'+esc(d)+'" placeholder="항목 '+(di+1)+'">'+
+          '<button type="button" class="adm-rm" data-action="rm-dislike" data-ci="'+ci+'" data-di="'+di+'">X</button></div>';
+      }).join('')+
+      '<button type="button" class="adm-add" data-action="add-dislike" data-ci="'+ci+'" style="margin:4px 0">+ 추가</button>'+
+      '<div class="adm-sec">스포일러</div>'+
+      '<p class="adm-hint">[열람 확인 모달 뒤에 표시되는 내용입니다.]</p>'+
+      rw('스포일러 내용',area(p+'.spoiler','스포일러 내용',5))+
     '</div>';
   }).join('')+'</div>';
 }
 
 function rComm(){
   rArr('commissions','커미션',function(p){
-    return rw('이미지 경로',inp(p+'.src','assets/img/commission/...'))+
+    return rw('이미지 경로',imgInp(p+'.src','assets/img/commission/...'))+
       rw('태그',sel(p+'.tag',['해인','도훈','투샷']))+
       '<div class="adm-pair">'+rw('작가명',inp(p+'.artist','작가명'))+rw('날짜',inp(p+'.date','YYYY.MM'))+'</div>'+
       rw('코멘트',inp(p+'.note','코멘트 한 줄'));
@@ -233,7 +253,7 @@ function rComm(){
 
 function rPair(){
   rArr('pairframes','페어틀',function(p){
-    return rw('이미지 경로',inp(p+'.src','assets/img/pairframe/...'))+
+    return rw('이미지 경로',imgInp(p+'.src','assets/img/pairframe/...'))+
       '<div class="adm-pair">'+rw('태그',sel(p+'.tag',['투샷','해인','도훈']))+rw('제목',inp(p+'.title','페어틀 제목'))+'</div>'+
       '<div class="adm-pair">'+rw('제작자',inp(p+'.maker','제작자'))+rw('날짜',inp(p+'.date','YYYY.MM'))+'</div>'+
       rw('코멘트',inp(p+'.note','코멘트 한 줄'));
@@ -365,6 +385,23 @@ ed.addEventListener('click',function(e){
   if(a==='rm-para'){D.logs[+b.dataset.li].body.splice(+b.dataset.pi,1);persist();render();}
   if(a==='add-msg'){D.chats[+b.dataset.ci].messages.push({from:'haein',text:'',time:''});persist();render();}
   if(a==='rm-msg'){D.chats[+b.dataset.ci].messages.splice(+b.dataset.mi,1);persist();render();}
+  if(a==='upload'){
+    var target=b.dataset.target;
+    var fi=document.createElement('input');fi.type='file';fi.accept='image/*';
+    fi.onchange=async function(){
+      if(!fi.files[0]||!adm)return;
+      try{
+        showToast('[이미지를 업로드하고 있습니다…]');
+        var res=await adm.media.upload(fi.files[0]);
+        sp(target,res.url);persist();render();
+        showToast('[업로드 완료 — '+res.name+']');
+      }catch(e){showToast('[업로드 실패 — '+(e.message||e)+']')}
+    };fi.click();return;
+  }
+  if(a==='add-like'){if(!D.characters[+b.dataset.ci].likes)D.characters[+b.dataset.ci].likes=[];D.characters[+b.dataset.ci].likes.push('');persist();render();}
+  if(a==='rm-like'){D.characters[+b.dataset.ci].likes.splice(+b.dataset.li,1);persist();render();}
+  if(a==='add-dislike'){if(!D.characters[+b.dataset.ci].dislikes)D.characters[+b.dataset.ci].dislikes=[];D.characters[+b.dataset.ci].dislikes.push('');persist();render();}
+  if(a==='rm-dislike'){D.characters[+b.dataset.ci].dislikes.splice(+b.dataset.di,1);persist();render();}
   if(a==='add-boot'){if(!D.site.boot)D.site.boot=[];D.site.boot.push({text:'',cls:'',wait:500});persist();render();}
   if(a==='rm-boot'){D.site.boot.splice(+b.dataset.i,1);persist();render();}
   if(a==='add-knock'){if(!D.site.knock)D.site.knock=[];D.site.knock.push('');persist();render();}
@@ -428,7 +465,12 @@ document.getElementById('btn-export').addEventListener('click',function(){
     L.push("    ],");
     L.push("    traits: "+q(c.traits)+",");
     L.push("    relation: "+q(c.relation)+",");
-    L.push("    memo: "+q(c.memo));
+    L.push("    appearance: "+q(c.appearance||'')+",");
+    L.push("    personality: "+q(c.personality||'')+",");
+    L.push("    background: "+q(c.background||'')+",");
+    L.push("    likes: ["+((c.likes||[]).map(q).join(', '))+"],");
+    L.push("    dislikes: ["+((c.dislikes||[]).map(q).join(', '))+"],");
+    L.push("    spoiler: "+q(c.spoiler||''));
     L.push('  }'+(ci<D.characters.length-1?',':''));
   });
   L.push('];');
