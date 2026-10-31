@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>타임라인 · 403 Forbidden</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbit&family=Silkscreen&family=Gowun+Batang:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-toast="[‘타임라인’ 을 불러왔습니다.]">
+<main class="desk">
+  <section class="win wrap wrap--narrow pop">
+    <div class="win-bar">
+      <h1 class="win-title" style="margin:0;font-weight:400">TIMELINE — /us/access.log</h1>
+      <a href="home.html">← 메뉴</a>
+    </div>
+    <div class="win-head">[두 캐릭터의 접근 기록을 시간순으로 출력합니다.]</div>
+    <ol class="tl" id="tl"></ol>
+  </section>
+</main>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/common.js"></script>
+<script>
+document.getElementById('tl').innerHTML = TIMELINE.map((e) => `
+  <li class="${e.type === 'deny' ? 'is-deny' : e.type === 'ok' ? 'is-ok' : ''}">
+    <div class="tl-date">${esc(e.date)}</div>
+    <div class="tl-rail" aria-hidden="true"><span class="tl-dot"></span><span class="tl-line"></span></div>
+    <div class="tl-body">
+      <div class="tl-head"><span class="chip">${esc(e.code)}</span><span class="tl-title">${esc(e.title)}</span></div>
+      <div class="tl-desc">${esc(e.desc)}</div>
+    </div>
+  </li>`).join('');
+</script>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SYSTEM MENU · 403 Forbidden</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbit&family=Silkscreen&family=Gowun+Batang:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-toast="[‘시스템 메뉴’ 를 불러왔습니다.]">
+<main class="desk">
+  <div class="wrap">
+    <div class="notice">
+      <span>[‘us’ 영역의 접근이 허용되었습니다.]</span>
+      <small>LAST SYNC <span data-site="lastSync"></span></small>
+    </div>
+
+    <section class="win pop">
+      <div class="win-bar">
+        <h1 class="win-title" style="margin:0;font-weight:400">SYSTEM MENU — /us</h1>
+        <a href="index.html">로그아웃</a>
+      </div>
+      <div class="home-body">
+        <div class="home-chars">
+          <div class="label">REGISTERED CHARACTERS</div>
+          <div id="chars" style="display:flex;flex-direction:column;gap:14px"></div>
+          <div class="home-memo">[관계 상태: 접근 허용됨]<br><span data-site="pairLine"></span></div>
+        </div>
+
+        <nav class="apps" aria-label="메뉴">
+          <a class="app" href="commission.html">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5" aria-hidden="true"><path d="M4 5h16v14H4z M4 15l5-5 4 4 3-3 4 4"/><circle cx="15" cy="9.5" r="1"/></svg>
+            <span>커미션</span><small>COMMISSION/</small>
+          </a>
+          <a class="app" href="pairframe.html">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5" aria-hidden="true"><path d="M3 5h8v14H3z M13 5h8v14h-8z"/></svg>
+            <span>페어틀</span><small>PAIRFRAME/</small>
+          </a>
+          <a class="app" href="log.html">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5" aria-hidden="true"><path d="M6 3h9l4 4v14H6z M15 3v4h4 M9 12h7 M9 16h7"/></svg>
+            <span>글 로그</span><small>LOG.TXT</small>
+          </a>
+          <a class="app" href="messenger.html">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/></svg>
+            <span>메신저 백업</span><small>CHAT.BAK</small>
+          </a>
+          <a class="app" href="wiki.html">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/></svg>
+            <span>캐릭터 위키</span><small>REGISTRY/</small>
+          </a>
+          <a class="app" href="timeline.html">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5" aria-hidden="true"><path d="M12 3v18 M12 7h6 M12 12H6 M12 17h6"/></svg>
+            <span>타임라인</span><small>TIMELINE</small>
+          </a>
+        </nav>
+      </div>
+    </section>
+
+    <div class="home-foot">
+      <span data-site="footer"></span>
+      <span data-site="contact"></span>
+    </div>
+  </div>
+</main>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/common.js"></script>
+<script>
+document.getElementById('chars').innerHTML = CHARACTERS.map((c) => `
+  <a class="char-card" href="wiki.html#${esc(c.id)}">
+    <span class="char-face">${media(c.face, 'IMG', c.name)}</span>
+    <span><span class="char-name">${esc(c.name)}</span>
+    <span class="char-sub">등록번호 ${esc(c.rows[0][1])} · 권한 ✓</span></span>
+  </a>`).join('');
+</script>
+</body>
+</html>

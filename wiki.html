@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>캐릭터 위키 · 403 Forbidden</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbit&family=Silkscreen&family=Gowun+Batang:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-toast="[‘캐릭터 등록 정보’ 를 불러왔습니다.]">
+<main class="desk">
+  <section class="win wrap pop">
+    <div class="win-bar">
+      <h1 class="win-title" style="margin:0;font-weight:400">REGISTRY — 캐릭터 등록 정보</h1>
+      <a href="home.html">← 메뉴</a>
+    </div>
+    <div class="win-head">
+      <div class="tabs" role="group" aria-label="캐릭터 선택" id="tabs"></div>
+    </div>
+    <div class="wiki" id="wiki" aria-live="polite"></div>
+  </section>
+</main>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/common.js"></script>
+<script>
+(function () {
+  const tabs = document.getElementById('tabs');
+  const wiki = document.getElementById('wiki');
+  let cur = CHARACTERS.findIndex((c) => '#' + c.id === location.hash);
+  if (cur < 0) cur = 0;
+
+  function render() {
+    const c = CHARACTERS[cur];
+    tabs.innerHTML = CHARACTERS.map((x, i) =>
+      `<button type="button" class="tab" data-i="${i}" aria-pressed="${i === cur}">${esc(x.name)}</button>`).join('');
+    wiki.innerHTML = `
+      <div class="wiki-loaded">[‘${esc(c.name)}’ 의 등록 정보를 불러왔습니다.]</div>
+      <div class="wiki-top">
+        <div class="portrait">${media(c.portrait, 'PORTRAIT', c.name)}</div>
+        <div class="statbox">
+          <div class="statbox-head"><strong>${esc(c.name)}</strong><small>${esc(c.tag)}</small></div>
+          <dl class="stats">${c.rows.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('')}</dl>
+        </div>
+      </div>
+      <div class="wiki-cols">
+        <section class="panel"><h2>[보유 특성]</h2><div>${esc(c.traits)}</div></section>
+        <section class="panel"><h2>[관계]</h2><div>대상: ${esc(c.other)}
+권한: 있음
+접근: <span style="color:var(--green)">허용됨</span>
+${esc(c.relation)}</div></section>
+      </div>
+      <section class="panel panel--sheet"><h2>[개요]</h2><p>${esc(c.memo)}</p></section>`;
+    replay(wiki, 'pop');
+  }
+
+  tabs.addEventListener('click', (e) => {
+    const b = e.target.closest('.tab');
+    if (!b) return;
+    cur = Number(b.dataset.i);
+    history.replaceState(null, '', '#' + CHARACTERS[cur].id);
+    render();
+  });
+  render();
+})();
+</script>
+</body>
+</html>

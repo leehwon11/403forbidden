@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>403 Forbidden</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbit&family=Silkscreen&family=Gowun+Batang:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<div class="boot" id="boot" hidden>
+  <div id="boot-lines"></div>
+  <span class="boot-cursor" aria-hidden="true"></span>
+  <button type="button" class="boot-skip" id="boot-skip">건너뛰기</button>
+</div>
+
+<main class="desk desk--center">
+  <div class="sysline">PLANET.EARTH / SYSTEM v0.403</div>
+
+  <div class="alert pop" id="alert-wrap">
+    <section class="win" id="alert" aria-labelledby="alert-title">
+      <div class="win-bar">
+        <h1 class="win-title" id="alert-title" style="margin:0;font-weight:400">SYSTEM ALERT — 403</h1>
+        <span class="win-box" aria-hidden="true"></span>
+      </div>
+
+      <div class="alert-body">
+        <svg class="alert-icon" width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.6" aria-hidden="true">
+          <rect x="5" y="11" width="14" height="10" rx="1"/>
+          <path id="shackle" d="M8 11V7a4 4 0 0 1 8 0v4"/>
+          <path d="M12 15v2"/>
+        </svg>
+        <div class="alert-text">
+          <div class="alert-lines" id="alert-lines" aria-live="polite"></div>
+          <div class="checklist">
+            <div><b>[v]</b> 등록 캐릭터 · 현도훈 — 권한</div>
+            <div><b>[v]</b> 등록 캐릭터 · 모해인 — 권한</div>
+            <div><b id="time-mark">[ ]</b> 때</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="alert-actions" id="actions-locked">
+        <button type="button" class="btn" id="btn-retry">재시도</button>
+        <button type="button" class="btn" id="btn-wait">기다리기</button>
+      </div>
+      <div class="alert-actions" id="actions-open" hidden>
+        <button type="button" class="btn btn--flat" id="btn-reset">처음부터</button>
+        <a class="btn btn--dark" href="home.html">접속 →</a>
+      </div>
+    </section>
+  </div>
+
+  <p class="footnote"><span data-site="footer"></span><br><span data-site="notice"></span></p>
+</main>
+
+<div class="flash" id="flash" aria-hidden="true"></div>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/common.js"></script>
+<script>
+(function () {
+  const BOOT = [
+    ['> PLANET.EARTH SYSTEM v0.403', 'dim'],
+    ['[시스템을 기동합니다…]', ''],
+    ['[등록 캐릭터 데이터를 불러오는 중… 2/2]', ''],
+    ['[현도훈 — 확인]', ''],
+    ['[모해인 — 확인]', ''],
+    ['[‘us’ 영역에 대한 접근 요청을 감지했습니다.]', 'alert']
+  ];
+  const KNOCK = [
+    '조건이 충족되지 않았습니다: 때',
+    '425 Too Early — 거절이 아닙니다. 아직 이를 뿐입니다.',
+    '반대편에서도 같은 요청이 감지되었습니다.',
+    '재시도로는 열리지 않습니다.'
+  ];
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const boot = document.getElementById('boot');
+  const bootLines = document.getElementById('boot-lines');
+  const alertWrap = document.getElementById('alert-wrap');
+  const alertWin = document.getElementById('alert');
+  const title = document.getElementById('alert-title');
+  const lines = document.getElementById('alert-lines');
+  const timeMark = document.getElementById('time-mark');
+  const shackle = document.getElementById('shackle');
+  let knocks = 0, timer = null;
+
+  /* ---- 부팅 ---- */
+  function endBoot() {
+    clearInterval(timer);
+    boot.hidden = true;
+    sessionStorage.setItem('booted', '1');
+    replay(alertWrap, 'pop');
+    document.getElementById('btn-retry').focus();
+  }
+  function runBoot() {
+    boot.hidden = false;
+    let i = 0;
+    timer = setInterval(() => {
+      if (i < BOOT.length) {
+        const [text, kind] = BOOT[i++];
+        const d = document.createElement('div');
+        d.className = 'boot-line' + (kind ? ' boot-line--' + kind : '');
+        d.textContent = text;
+        bootLines.appendChild(d);
+      } else {
+        clearInterval(timer);
+        setTimeout(endBoot, 700);
+      }
+    }, 420);
+    document.getElementById('boot-skip').addEventListener('click', endBoot);
+  }
+  let seen = false;
+  try { seen = sessionStorage.getItem('booted') === '1'; } catch (e) {}
+  if (SITE.bootIntro && !seen && !reduce) runBoot();
+
+  /* ---- 경고창 ---- */
+  function renderLines(open) {
+    const base = [
+      ['‘us’ 영역에 대한 접근을 시도합니다.', ''],
+      ['두 캐릭터의 권한이 모두 확인되었습니다.', '']
+    ];
+    const rows = open
+      ? [['조건 ‘때’가 충족되었습니다.', ''], ['200 OK — ‘us’ 영역의 접근을 허용합니다.', 'is-ok']]
+      : base.concat([[KNOCK[Math.min(knocks, KNOCK.length - 1)], 'is-red']]);
+    lines.innerHTML = rows.map(([t, c]) => `<div class="${c}">[${esc(t)}]</div>`).join('');
+  }
+  function setOpen(open) {
+    title.textContent = open ? 'SYSTEM — 200 OK' : 'SYSTEM ALERT — 403';
+    timeMark.textContent = open ? '[v]' : '[ ]';
+    shackle.setAttribute('d', open ? 'M8 11V7a4 4 0 0 1 7.5-2' : 'M8 11V7a4 4 0 0 1 8 0v4');
+    document.getElementById('actions-locked').hidden = open;
+    document.getElementById('actions-open').hidden = !open;
+    renderLines(open);
+  }
+
+  document.getElementById('btn-retry').addEventListener('click', () => {
+    knocks++;
+    renderLines(false);
+    replay(alertWin, 'shake');
+    replay(title, 'rgb');
+    replay(lines.lastElementChild, 'rgb');
+  });
+  document.getElementById('btn-wait').addEventListener('click', () => {
+    setOpen(true);
+    replay(document.getElementById('flash'), 'is-on');
+    document.querySelector('#actions-open .btn--dark').focus();
+  });
+  document.getElementById('btn-reset').addEventListener('click', () => {
+    knocks = 0;
+    setOpen(false);
+  });
+
+  setOpen(false);
+})();
+</script>
+</body>
+</html>

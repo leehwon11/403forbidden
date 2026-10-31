@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>메신저 백업 · 403 Forbidden</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbit&family=Silkscreen&family=Gowun+Batang:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-toast="[‘메신저 백업’ 을 불러왔습니다.]">
+<main class="desk">
+  <section class="win wrap pop">
+    <div class="win-bar">
+      <h1 class="win-title" style="margin:0;font-weight:400">CHAT.BAK — /us/MESSENGER</h1>
+      <a href="home.html">← 메뉴</a>
+    </div>
+    <div class="split">
+      <nav class="side" aria-label="대화 백업 목록">
+        <div class="side-head label">BACKUP FILES</div>
+        <div id="rooms"></div>
+      </nav>
+      <div class="chat">
+        <div class="chat-head"><span>현도훈 · 모해인</span><small id="room-title"></small></div>
+        <div class="chat-log" id="log" aria-live="polite"></div>
+        <div class="chat-input">
+          <label for="chat-in" class="sr-only">메시지 입력</label>
+          <input id="chat-in" disabled placeholder="[읽기 전용 백업입니다]">
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/common.js"></script>
+<script>
+(function () {
+  const rooms = document.getElementById('rooms');
+  const log = document.getElementById('log');
+  const haein = CHARACTERS.find((c) => c.id === 'haein') || { name: '모해인', face: '' };
+  let sel = 0;
+
+  function render() {
+    rooms.innerHTML = CHATS.map((r, i) => `
+      <button type="button" class="side-item" data-i="${i}" aria-current="${i === sel}">
+        <span>${esc(r.title)}</span><small>${esc(r.date)} · ${esc(r.about)}</small></button>`).join('');
+    const room = CHATS[sel];
+    document.getElementById('room-title').textContent = room.title;
+    log.innerHTML = room.messages.map((m) => {
+      if (m.from === 'system') return `<div class="sys">[${esc(m.text)}]</div>`;
+      if (m.from === 'error') return `<div class="sys sys--error">[${esc(m.text)}]</div>`;
+      if (m.from === 'dohun') return `<div class="msg msg--me"><div class="bubble">${esc(m.text)}</div><time>${esc(m.time)}</time></div>`;
+      return `<div class="msg">
+        <span class="msg-face">${media(haein.face, '해인', haein.name)}</span>
+        <div><span class="msg-name">${esc(haein.name)}</span><div class="bubble">${esc(m.text)}</div></div>
+        <time>${esc(m.time)}</time></div>`;
+    }).join('');
+  }
+
+  rooms.addEventListener('click', (e) => {
+    const b = e.target.closest('.side-item');
+    if (b) { sel = Number(b.dataset.i); render(); }
+  });
+  render();
+})();
+</script>
+</body>
+</html>
