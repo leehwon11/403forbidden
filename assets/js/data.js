@@ -15,7 +15,34 @@ const SITE = {
   pairLine: '[여기에 페어 한 줄 소개]',
   lastSync: '[YYYY.MM.DD]',
   contact: '[방명록 / 연락처 링크]',
-  bootIntro: true   // false 로 바꾸면 입구의 부팅 화면을 건너뛰어요
+  bootIntro: true,   // false 로 바꾸면 입구의 부팅 화면을 건너뛰어요
+  /* 부팅 시퀀스에 나오는 줄
+     text: 화면에 뜨는 문장, cls: 'dim' / 'alert' / '' (비어두면 기본), wait: 대기 밀리초 */
+  boot: [
+    { text: '> PLANET.EARTH SYSTEM v0.403', cls: 'dim', wait: 700 },
+    { text: '> BOOT SEQUENCE INITIATED', cls: 'dim', wait: 500 },
+    { text: '', cls: '', wait: 300 },
+    { text: '[커널을 로드합니다…]', cls: '', wait: 650 },
+    { text: '[메모리 할당… ■■■■■■■■ 완료]', cls: '', wait: 700 },
+    { text: '[시스템 시계 동기화…]', cls: 'dim', wait: 450 },
+    { text: '', cls: '', wait: 250 },
+    { text: '[등록 캐릭터 데이터베이스에 연결합니다…]', cls: '', wait: 800 },
+    { text: '[캐릭터 조회 중… 2건의 등록 데이터가 확인되었습니다.]', cls: '', wait: 600 },
+    { text: '[#1 현도훈 — 분류: DREAM — 권한: 확인됨]', cls: '', wait: 500 },
+    { text: '[#2 모해인 — 분류: ORIGINAL — 권한: 확인됨]', cls: '', wait: 500 },
+    { text: '', cls: '', wait: 300 },
+    { text: '[관계 로그를 동기화합니다…]', cls: '', wait: 700 },
+    { text: '[경고: 접근 거부 이력이 존재합니다 — 403 FORBIDDEN]', cls: 'alert', wait: 800 },
+    { text: '[‘us’ 영역에 대한 접근 요청이 감지되었습니다.]', cls: 'alert', wait: 700 },
+    { text: '[보안 프로토콜을 실행합니다…]', cls: '', wait: 600 }
+  ],
+  /* 입구에서 "재시도" 버튼을 누를 때마다 순서대로 나오는 문구 */
+  knock: [
+    '조건이 충족되지 않았습니다: 때',
+    '425 Too Early — 거절이 아닙니다. 아직 이를 뿐입니다.',
+    '반대편에서도 같은 요청이 감지되었습니다.',
+    '재시도로는 열리지 않습니다.'
+  ]
 };
 
 /* ---------- 등록 캐릭터 (홈 + 위키) ---------- */

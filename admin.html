@@ -56,6 +56,7 @@
         <button type="button" class="tab" data-tab="logs" aria-pressed="false">글 로그</button>
         <button type="button" class="tab" data-tab="chats" aria-pressed="false">메신저</button>
         <button type="button" class="tab" data-tab="timeline" aria-pressed="false">타임라인</button>
+        <button type="button" class="tab" data-tab="boot" aria-pressed="false">부팅/입구</button>
       </div>
     </div>
     <div id="ed"></div>
@@ -182,7 +183,7 @@ function rw(lb,html){return '<div class="adm-row"><label>'+esc(lb)+'</label>'+ht
 var ed=document.getElementById('ed'),curTab='site';
 
 function render(){
-  var fn={site:rSite,characters:rChars,commissions:rComm,pairframes:rPair,logs:rLogs,chats:rChats,timeline:rTL};
+  var fn={site:rSite,characters:rChars,commissions:rComm,pairframes:rPair,logs:rLogs,chats:rChats,timeline:rTL,boot:rBoot};
   (fn[curTab]||rSite)();
 }
 
@@ -302,14 +303,47 @@ function rTL(){
   });
 }
 
+function rBoot(){
+  if(!D.site.boot) D.site.boot=[];
+  if(!D.site.knock) D.site.knock=[];
+  ed.innerHTML='<div class="adm">'+
+    '<div class="adm-sec">부팅 시퀀스</div>'+
+    '<p class="adm-hint">[부팅 화면에 순서대로 나오는 줄입니다. cls: dim(흐리게) / alert(빨강) / 빈칸(기본)]</p>'+
+    D.site.boot.map(function(line,i){
+      var p='site.boot.'+i;
+      return '<div class="adm-card" style="padding:8px">'+
+        '<div class="adm-card-head"><span class="adm-card-title">줄 #'+(i+1)+'</span>'+
+        '<button type="button" class="adm-rm" data-action="rm-boot" data-i="'+i+'">X</button></div>'+
+        '<div class="adm-pair">'+
+          rw('TEXT',inp(p+'.text','화면에 뜨는 문장 (빈칸=빈 줄)'))+
+          '<div class="adm-pair">'+rw('CLS',sel(p+'.cls',[['','기본'],['dim','dim (흐리게)'],['alert','alert (빨강)']]))+
+          rw('WAIT (ms)',inp(p+'.wait','밀리초'))+'</div>'+
+        '</div></div>';
+    }).join('')+
+    '<button type="button" class="adm-add" data-action="add-boot">+ 부팅 줄 추가</button>'+
+    '<div class="adm-sec" style="margin-top:16px">입구 재시도 문구 (KNOCK)</div>'+
+    '<p class="adm-hint">[입구에서 "재시도" 버튼을 누를 때마다 순서대로 나오는 문구입니다.]</p>'+
+    D.site.knock.map(function(txt,i){
+      return '<div class="adm-inline">'+
+        '<input data-p="site.knock.'+i+'" value="'+esc(txt)+'" placeholder="재시도 문구 '+(i+1)+'">'+
+        '<button type="button" class="adm-rm" data-action="rm-knock" data-i="'+i+'" style="align-self:start">X</button></div>';
+    }).join('')+
+    '<button type="button" class="adm-add" data-action="add-knock">+ 재시도 문구 추가</button>'+
+  '</div>';
+}
+
 /* ---- 이벤트 ---- */
 ed.addEventListener('input',function(e){
   var p=e.target.dataset.p;if(!p)return;
-  sp(p,e.target.type==='checkbox'?e.target.checked:e.target.value);persist();
+  var v=e.target.type==='checkbox'?e.target.checked:e.target.value;
+  if(p.match(/\.wait$/))v=parseInt(v,10)||0;
+  sp(p,v);persist();
 });
 ed.addEventListener('change',function(e){
   var p=e.target.dataset.p;if(!p)return;
-  sp(p,e.target.type==='checkbox'?e.target.checked:e.target.value);persist();
+  var v=e.target.type==='checkbox'?e.target.checked:e.target.value;
+  if(p.match(/\.wait$/))v=parseInt(v,10)||0;
+  sp(p,v);persist();
 });
 
 var DEFAULTS={
@@ -331,6 +365,10 @@ ed.addEventListener('click',function(e){
   if(a==='rm-para'){D.logs[+b.dataset.li].body.splice(+b.dataset.pi,1);persist();render();}
   if(a==='add-msg'){D.chats[+b.dataset.ci].messages.push({from:'haein',text:'',time:''});persist();render();}
   if(a==='rm-msg'){D.chats[+b.dataset.ci].messages.splice(+b.dataset.mi,1);persist();render();}
+  if(a==='add-boot'){if(!D.site.boot)D.site.boot=[];D.site.boot.push({text:'',cls:'',wait:500});persist();render();}
+  if(a==='rm-boot'){D.site.boot.splice(+b.dataset.i,1);persist();render();}
+  if(a==='add-knock'){if(!D.site.knock)D.site.knock=[];D.site.knock.push('');persist();render();}
+  if(a==='rm-knock'){D.site.knock.splice(+b.dataset.i,1);persist();render();}
 });
 
 document.getElementById('tabs').addEventListener('click',function(e){
@@ -362,7 +400,17 @@ document.getElementById('btn-export').addEventListener('click',function(){
   L.push('  pairLine: '+q(s.pairLine)+',');
   L.push('  lastSync: '+q(s.lastSync)+',');
   L.push('  contact: '+q(s.contact)+',');
-  L.push('  bootIntro: '+(s.bootIntro?'true':'false'));
+  L.push('  bootIntro: '+(s.bootIntro?'true':'false')+',');
+  L.push('  boot: [');
+  (s.boot||[]).forEach(function(b,i){
+    L.push("    { text: "+q(b.text)+", cls: "+q(b.cls)+", wait: "+(b.wait||0)+" }"+(i<(s.boot||[]).length-1?',':''));
+  });
+  L.push('  ],');
+  L.push('  knock: [');
+  (s.knock||[]).forEach(function(k,i){
+    L.push("    "+q(k)+(i<(s.knock||[]).length-1?',':''));
+  });
+  L.push('  ]');
   L.push('};');
   L.push('');
   L.push('/* ---------- 등록 캐릭터 (홈 + 위키) ---------- */');
