@@ -277,8 +277,10 @@
 
 <!-- ===== 캐릭터 등록증 모달 ===== -->
 <div class="modal-overlay" id="idcard-modal" hidden>
-  <div id="idcard-body"></div>
-  <button type="button" class="btn" id="idcard-close" style="margin-top:12px">닫기</button>
+  <div class="modal-box" style="padding:0;background:transparent;border:none;box-shadow:none;max-width:440px">
+    <div id="idcard-body"></div>
+    <button type="button" class="btn" id="idcard-close" style="margin-top:12px;display:block;margin-left:auto;margin-right:auto">닫기</button>
+  </div>
 </div>
 
 <!-- ===== 스크린세이버 ===== -->
@@ -921,22 +923,34 @@
     var regNo = (c.rows.find(function (r) { return r[0] === '등록번호'; }) || ['', ''])[1];
     var cls = (c.rows.find(function (r) { return r[0] === '분류'; }) || ['', ''])[1];
     var grade = (c.rows.find(function (r) { return r[0] === '등급'; }) || ['', ''])[1];
+    var status = (c.rows.find(function (r) { return r[0] === '상태'; }) || ['', ''])[1];
+    var bars = '';
+    for (var i = 0; i < 32; i++) {
+      var h = 8 + Math.floor(Math.random() * 13);
+      bars += '<span style="height:' + h + 'px"></span>';
+    }
+    var stampCls = c.tag === 'DREAM' ? 'id-card-stamp' : 'id-card-stamp id-card-stamp--orig';
     document.getElementById('idcard-body').innerHTML =
       '<div class="id-card">' +
         '<div class="id-card-top">PLANET.EARTH SYSTEM — CHARACTER REGISTRATION CARD</div>' +
-        '<div class="id-card-body">' +
+        '<div class="id-card-main">' +
           '<div class="id-card-photo">' + media(c.portrait || c.face, 'PHOTO', c.name) + '</div>' +
           '<div class="id-card-info">' +
             '<div class="id-card-name">' + esc(c.name) + '</div>' +
-            '<div class="id-card-field"><span>REGISTRATION NO.</span><span>' + esc(regNo) + '</span></div>' +
-            '<div class="id-card-field"><span>CLASSIFICATION</span><span>' + esc(cls) + '</span></div>' +
-            '<div class="id-card-field"><span>TAG</span><span>' + esc(c.tag) + '</span></div>' +
-            '<div class="id-card-field"><span>GRADE</span><span>' + esc(grade) + '</span></div>' +
-            '<div class="id-card-field"><span>PAIR</span><span>' + esc(c.other) + '</span></div>' +
+            '<dl>' +
+              '<div class="id-card-field"><dt>REG. NO.</dt><dd>' + esc(regNo) + '</dd></div>' +
+              '<div class="id-card-field"><dt>CLASS</dt><dd>' + esc(cls) + '</dd></div>' +
+              '<div class="id-card-field"><dt>TAG</dt><dd>' + esc(c.tag) + '</dd></div>' +
+              '<div class="id-card-field"><dt>GRADE</dt><dd>' + esc(grade) + '</dd></div>' +
+              '<div class="id-card-field"><dt>STATUS</dt><dd>' + esc(status) + '</dd></div>' +
+              '<div class="id-card-field"><dt>PAIR</dt><dd>' + esc(c.other) + '</dd></div>' +
+            '</dl>' +
           '</div>' +
         '</div>' +
-        '<div class="id-card-barcode" aria-hidden="true"></div>' +
-        '<div class="id-card-stamp">' + esc(c.tag) + '</div>' +
+        '<div class="id-card-bottom">' +
+          '<div class="id-card-barcode" aria-hidden="true">' + bars + '</div>' +
+          '<div class="' + stampCls + '">' + esc(c.tag) + '</div>' +
+        '</div>' +
       '</div>';
     modal.hidden = false;
     sfx('open');
