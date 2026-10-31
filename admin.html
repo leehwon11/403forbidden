@@ -31,17 +31,20 @@
 @media(max-width:600px){.adm-pair{grid-template-columns:1fr}}
 .adm-msg{display:grid;grid-template-columns:90px 1fr 80px;gap:4px;align-items:start;margin-bottom:4px}
 @media(max-width:600px){.adm-msg{grid-template-columns:1fr}}
-.adm-saved{font-size:12px;color:var(--green,#0a0);margin-right:auto;align-self:center}
+.adm-saved{font-size:12px;margin-right:auto;align-self:center}
 .adm-hint{font-size:12px;color:var(--muted);margin-top:-4px}
 .adm-inline{display:flex;gap:4px;margin-bottom:4px}
 .adm-inline textarea{flex:1}
+.adm-conn{font-size:12px;padding:2px 8px}
 </style>
 </head>
 <body>
 <main class="desk">
   <section class="win wrap pop">
-    <div class="win-bar">
+    <div class="win-bar" style="gap:8px">
       <h1 class="win-title" style="margin:0;font-weight:400">ADMIN — /system/config</h1>
+      <span class="adm-conn" id="conn"></span>
+      <button type="button" class="btn btn--flat" id="btn-auth" style="font-size:12px;padding:2px 10px">로그인</button>
       <a href="index.html">← 사이트</a>
     </div>
     <div class="win-head" style="flex-wrap:wrap">
@@ -58,8 +61,9 @@
     <div id="ed"></div>
     <div class="adm-foot">
       <span class="adm-saved" id="status"></span>
+      <button type="button" class="btn btn--dark" id="btn-save" disabled>저장</button>
       <button type="button" class="btn" id="btn-reset">초기화</button>
-      <button type="button" class="btn btn--dark" id="btn-export">data.js 내보내기</button>
+      <button type="button" class="btn" id="btn-export">data.js 내보내기</button>
     </div>
   </section>
 </main>
@@ -67,16 +71,97 @@
 <script src="assets/js/data.js"></script>
 <script src="assets/js/common.js"></script>
 <script>
-(function(){
+(async function(){
+
+/* ======== 나루 SDK ======== */
+var COLS=['site','characters','commissions','pairframes','logs','chats','timeline'];
+var naru=null,adm=null;
+try{
+  var mod=await import('https://sdk.naru.pub/sdk/1.0.0/naru.js');
+  naru=mod.createNaru();
+  adm=await naru.auth.session();
+}catch(e){console.warn('Naru SDK:',e.message)}
+
+function updateConn(){
+  var el=document.getElementById('conn');
+  var btn=document.getElementById('btn-auth');
+  var save=document.getElementById('btn-save');
+  if(adm){
+    el.textContent='[DB 연결됨]';el.style.color='var(--green,#0a0)';
+    btn.textContent='로그아웃';save.disabled=false;
+  }else{
+    el.textContent=naru?'[미연결]':'[오프라인]';el.style.color='var(--muted)';
+    btn.textContent='로그인';save.disabled=true;
+  }
+}
+
+async function loadFromNaru(){
+  if(!naru)return false;
+  try{
+    var src=adm||naru;
+    var docs=await Promise.all(COLS.map(function(c){
+      return src.collection(c).get('config').catch(function(){return null});
+    }));
+    if(docs[0])D.site=docs[0].data;
+    if(docs[1])D.characters=docs[1].data;
+    if(docs[2])D.commissions=docs[2].data;
+    if(docs[3])D.pairframes=docs[3].data;
+    if(docs[4])D.logs=docs[4].data;
+    if(docs[5])D.chats=docs[5].data;
+    if(docs[6])D.timeline=docs[6].data;
+    persist();return true;
+  }catch(e){return false}
+}
+
+document.getElementById('btn-auth').addEventListener('click',async function(){
+  if(adm){
+    await adm.signOut();adm=null;updateConn();
+    showToast('[로그아웃되었습니다.]');
+  }else if(naru){
+    try{
+      await naru.auth.signIn({collections:COLS});
+      adm=await naru.auth.session();
+      if(adm){
+        updateConn();
+        var ok=await loadFromNaru();
+        render();
+        showToast(ok?'[로그인 — 데이터를 불러왔습니다.]':'[로그인 — 저장된 데이터가 없습니다. 기본값을 사용합니다.]');
+      }
+    }catch(e){showToast('[로그인 실패 — '+e.message+']')}
+  }else{
+    showToast('[나루 SDK를 불러올 수 없습니다.]');
+  }
+});
+
+document.getElementById('btn-save').addEventListener('click',async function(){
+  if(!adm)return;
+  try{
+    var keys=['site','characters','commissions','pairframes','logs','chats','timeline'];
+    var vals=[D.site,D.characters,D.commissions,D.pairframes,D.logs,D.chats,D.timeline];
+    await adm.batch(keys.map(function(k,i){
+      return {collection:k,set:{id:'config',data:vals[i]}};
+    }));
+    document.getElementById('status').textContent='[DB 저장 완료]';
+    document.getElementById('status').style.color='var(--green,#0a0)';
+    showToast('[데이터가 저장되었습니다 — 사이트에 바로 반영됩니다.]');
+  }catch(e){
+    showToast('[저장 실패 — '+(e.code||e.message)+']');
+  }
+});
+
+/* ======== 데이터 ======== */
 var D=JSON.parse(JSON.stringify({
   site:SITE,characters:CHARACTERS,commissions:COMMISSIONS,
   pairframes:PAIRFRAMES,logs:LOGS,chats:CHATS,timeline:TIMELINE
 }));
 try{var sv=localStorage.getItem('admin403');if(sv)D=JSON.parse(sv)}catch(e){}
 
+if(adm){await loadFromNaru()}
+
 function persist(){
   try{localStorage.setItem('admin403',JSON.stringify(D))}catch(e){}
-  document.getElementById('status').textContent='[자동 저장됨]';
+  var st=document.getElementById('status');
+  st.textContent='[자동 저장됨]';st.style.color='var(--muted)';
 }
 function gp(path){return path.split('.').reduce(function(o,k){return o[isNaN(k)?k:+k]},D)}
 function sp(path,val){
@@ -277,7 +362,7 @@ document.getElementById('btn-export').addEventListener('click',function(){
   L.push('  pairLine: '+q(s.pairLine)+',');
   L.push('  lastSync: '+q(s.lastSync)+',');
   L.push('  contact: '+q(s.contact)+',');
-  L.push('  bootIntro: '+(s.bootIntro?'true':'false')+'   // false 로 바꾸면 입구의 부팅 화면을 건너뛰어요');
+  L.push('  bootIntro: '+(s.bootIntro?'true':'false'));
   L.push('};');
   L.push('');
   L.push('/* ---------- 등록 캐릭터 (홈 + 위키) ---------- */');
@@ -300,26 +385,21 @@ document.getElementById('btn-export').addEventListener('click',function(){
   });
   L.push('];');
   L.push('');
-  L.push('/* ---------- 이미지 백업: 커미션 ----------');
-  L.push("   tag 는 '해인' / '도훈' / '투샷' 중 하나 (필터 버튼과 같은 글자) */");
+  L.push("/* ---------- 커미션 ---------- */");
   L.push('const COMMISSIONS = [');
   D.commissions.forEach(function(c,i){
     L.push("  { src: "+q(c.src)+", tag: "+q(c.tag)+", artist: "+q(c.artist)+", date: "+q(c.date)+", note: "+q(c.note)+" }"+(i<D.commissions.length-1?',':''));
   });
   L.push('];');
   L.push('');
-  L.push('/* ---------- 이미지 백업: 페어틀 (가로형) ---------- */');
+  L.push("/* ---------- 페어틀 ---------- */");
   L.push('const PAIRFRAMES = [');
   D.pairframes.forEach(function(f,i){
     L.push("  { src: "+q(f.src)+", tag: "+q(f.tag)+", title: "+q(f.title)+", maker: "+q(f.maker)+", date: "+q(f.date)+", note: "+q(f.note)+" }"+(i<D.pairframes.length-1?',':''));
   });
   L.push('];');
   L.push('');
-  L.push('/* ---------- 글 로그 ----------');
-  L.push('   body: 문단마다 따옴표로 감싸고 쉴표로 구분');
-  L.push('   password: 비워두면 공개 글, 적으면 잠긴 글');
-  L.push("   ※ 주의: 이 비밀번호는 '연출용'이에요. 사이트 소스 보기를 하면 누구나 볼 수 있어서");
-  L.push('     진짜로 숨겨야 하는 글에는 쓰지 마세요. */');
+  L.push("/* ---------- 글 로그 ---------- */");
   L.push('const LOGS = [');
   D.logs.forEach(function(l,i){
     L.push("  { title: "+q(l.title)+", date: "+q(l.date)+", pov: "+q(l.pov)+", password: "+q(l.password)+",");
@@ -327,8 +407,7 @@ document.getElementById('btn-export').addEventListener('click',function(){
   });
   L.push('];');
   L.push('');
-  L.push('/* ---------- 메신저 백업 ----------');
-  L.push("   from: 'haein'(왼쪽) / 'dohun'(오른쪽) / 'system'(가운데 알림) / 'error'(빨간 알림) */");
+  L.push("/* ---------- 메신저 ---------- */");
   L.push('const CHATS = [');
   D.chats.forEach(function(r,ri){
     L.push('  {');
@@ -345,8 +424,7 @@ document.getElementById('btn-export').addEventListener('click',function(){
   });
   L.push('];');
   L.push('');
-  L.push('/* ---------- 타임라인 ----------');
-  L.push("   type: 'deny'(빨강) / 'ok'(초록) / ''(흰색) */");
+  L.push("/* ---------- 타임라인 ---------- */");
   L.push('const TIMELINE = [');
   D.timeline.forEach(function(t,i){
     L.push("  { date: "+q(t.date)+", code: "+q(t.code)+", type: "+q(t.type)+", title: "+q(t.title)+", desc: "+q(t.desc)+" }"+(i<D.timeline.length-1?',':''));
@@ -362,8 +440,12 @@ document.getElementById('btn-export').addEventListener('click',function(){
 });
 
 /* ---- 초기화 ---- */
-document.getElementById('btn-reset').addEventListener('click',function(){
-  if(!confirm('모든 수정을 초기화하시겠습니까? data.js의 원본 값으로 돌아갑니다.'))return;
+document.getElementById('btn-reset').addEventListener('click',async function(){
+  if(!confirm('모든 수정을 초기화하시겠습니까?'))return;
+  if(adm){
+    var ok=await loadFromNaru();
+    if(ok){render();showToast('[DB에서 데이터를 다시 불러왔습니다.]');return;}
+  }
   D=JSON.parse(JSON.stringify({
     site:SITE,characters:CHARACTERS,commissions:COMMISSIONS,
     pairframes:PAIRFRAMES,logs:LOGS,chats:CHATS,timeline:TIMELINE
@@ -373,13 +455,8 @@ document.getElementById('btn-reset').addEventListener('click',function(){
   showToast('[원본 데이터로 초기화되었습니다.]');
 });
 
-document.getElementById('tabs').addEventListener('click',function(e){
-  var t=e.target.closest('.tab');if(!t)return;
-  curTab=t.dataset.tab;
-  document.querySelectorAll('#tabs .tab').forEach(function(b){b.setAttribute('aria-pressed',String(b===t))});
-  render();
-});
-
+/* ---- 시작 ---- */
+updateConn();
 fillSite();
 showToast('[관리자 모드를 불러왔습니다.]');
 render();

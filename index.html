@@ -254,8 +254,36 @@
 <script src="assets/js/data.js"></script>
 <script src="assets/js/common.js"></script>
 <script>
-(function () {
+(async function () {
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ======== 나루 DB 데이터 로드 (비동기, 부팅과 병렬) ======== */
+  var naruReady = (async function () {
+    try {
+      var mod = await Promise.race([
+        import('https://sdk.naru.pub/sdk/1.0.0/naru.js'),
+        new Promise(function (_, r) { setTimeout(r, 3000); })
+      ]);
+      var naru = mod.createNaru();
+      var COLS = ['site','characters','commissions','pairframes','logs','chats','timeline'];
+      var GLOBALS = [SITE, CHARACTERS, COMMISSIONS, PAIRFRAMES, LOGS, CHATS, TIMELINE];
+      var docs = await Promise.all(COLS.map(function (c) {
+        return naru.collection(c).get('config').catch(function () { return null; });
+      }));
+      var loaded = false;
+      docs.forEach(function (doc, i) {
+        if (!doc) return;
+        loaded = true;
+        if (Array.isArray(GLOBALS[i])) {
+          GLOBALS[i].splice(0, GLOBALS[i].length);
+          if (Array.isArray(doc.data)) doc.data.forEach(function (item) { GLOBALS[i].push(item); });
+        } else {
+          Object.keys(doc.data).forEach(function (k) { GLOBALS[i][k] = doc.data[k]; });
+        }
+      });
+      return loaded;
+    } catch (e) { return false; }
+  })();
 
   /* ======== 부팅 시퀀스 (강화) ======== */
   var BOOT = [
@@ -697,6 +725,13 @@
 
   /* ======== 초기화 ======== */
   fillSite();
+
+  naruReady.then(function (ok) {
+    if (!ok) return;
+    fillSite();
+    Object.keys(inited).forEach(function (k) { delete inited[k]; });
+    if (!appEl.hidden) navigate(location.hash.replace('#', '') || 'home');
+  });
 
   var entered = false;
   try { entered = sessionStorage.getItem('entered') === '1'; } catch (e) {}
