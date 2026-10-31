@@ -454,14 +454,9 @@
     document.getElementById('btn-retry').disabled = true;
     self.textContent = '[처리 중...]';
 
-    var steps = [
+    var steps = SITE.waitSteps && SITE.waitSteps.length ? SITE.waitSteps : [
       { text: '[조건을 재검토합니다...]', wait: 600 },
-      { text: '[권한 데이터를 다시 조회합니다...]', wait: 700 },
-      { text: '[현도훈 — 권한 재확인... 유효]', wait: 500 },
-      { text: '[모해인 — 권한 재확인... 유효]', wait: 500 },
-      { text: '[관계 상태를 동기화합니다...]', wait: 800 },
-      { text: '[때 — 조건 충족 여부 판정 중...]', wait: 900 },
-      { text: '[102 PROCESSING — 요청을 처리하고 있습니다.]', wait: 700 },
+      { text: '[102 PROCESSING]', wait: 700 },
       { text: '[조건이 충족되었습니다: 때]', wait: 600 }
     ];
 

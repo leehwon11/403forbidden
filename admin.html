@@ -349,6 +349,19 @@ function rBoot(){
         '<button type="button" class="adm-rm" data-action="rm-knock" data-i="'+i+'" style="align-self:start">X</button></div>';
     }).join('')+
     '<button type="button" class="adm-add" data-action="add-knock">+ 재시도 문구 추가</button>'+
+    '<div class="adm-sec" style="margin-top:16px">기다리기 연출 단계 (WAIT STEPS)</div>'+
+    '<p class="adm-hint">[기다리기 버튼을 누르면 순서대로 나오는 시스템 처리 문구입니다.]</p>'+
+    (D.site.waitSteps||[]).map(function(step,i){
+      var p='site.waitSteps.'+i;
+      return '<div class="adm-card" style="padding:8px">'+
+        '<div class="adm-card-head"><span class="adm-card-title">단계 #'+(i+1)+'</span>'+
+        '<button type="button" class="adm-rm" data-action="rm-wait" data-i="'+i+'">X</button></div>'+
+        '<div class="adm-pair">'+
+          rw('TEXT',inp(p+'.text','시스템 처리 문구'))+
+          rw('WAIT (ms)',inp(p+'.wait','밀리초'))+
+        '</div></div>';
+    }).join('')+
+    '<button type="button" class="adm-add" data-action="add-wait">+ 기다리기 단계 추가</button>'+
   '</div>';
 }
 
@@ -406,6 +419,8 @@ ed.addEventListener('click',function(e){
   if(a==='rm-boot'){D.site.boot.splice(+b.dataset.i,1);persist();render();}
   if(a==='add-knock'){if(!D.site.knock)D.site.knock=[];D.site.knock.push('');persist();render();}
   if(a==='rm-knock'){D.site.knock.splice(+b.dataset.i,1);persist();render();}
+  if(a==='add-wait'){if(!D.site.waitSteps)D.site.waitSteps=[];D.site.waitSteps.push({text:'',wait:500});persist();render();}
+  if(a==='rm-wait'){D.site.waitSteps.splice(+b.dataset.i,1);persist();render();}
 });
 
 document.getElementById('tabs').addEventListener('click',function(e){
@@ -446,6 +461,11 @@ document.getElementById('btn-export').addEventListener('click',function(){
   L.push('  knock: [');
   (s.knock||[]).forEach(function(k,i){
     L.push("    "+q(k)+(i<(s.knock||[]).length-1?',':''));
+  });
+  L.push('  ],');
+  L.push('  waitSteps: [');
+  (s.waitSteps||[]).forEach(function(w,i){
+    L.push("    { text: "+q(w.text)+", wait: "+(w.wait||0)+" }"+(i<(s.waitSteps||[]).length-1?',':''));
   });
   L.push('  ]');
   L.push('};');
