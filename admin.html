@@ -10,12 +10,15 @@
 <link rel="stylesheet" href="assets/css/style.css">
 <style>
 /* layout: fixed header/tabs/footer, scrollable middle */
-.adm-shell{display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidden}
+body{margin:0;overflow:hidden;background:var(--desk)}
+.adm-shell{display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidden;
+  max-width:860px;margin:0 auto;border-left:2px solid var(--ink);border-right:2px solid var(--ink);
+  box-shadow:4px 4px 0 var(--ink);background:var(--paper)}
 .adm-bar{flex:none}
-.adm-tabs-wrap{flex:none;border-bottom:2px solid var(--border);background:var(--bg)}
-.adm-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.adm-tabs-wrap{flex:none;border-bottom:2px solid var(--ink);background:var(--paper);padding:0}
+.adm-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;background:var(--sheet,var(--paper))}
 .adm-foot{flex:none;display:flex;gap:8px;padding:10px 16px;justify-content:flex-end;flex-wrap:wrap;
-  border-top:2px solid var(--border);background:var(--bg)}
+  border-top:2px solid var(--ink);background:var(--paper)}
 
 /* form elements */
 .adm{padding:16px;display:flex;flex-direction:column;gap:12px;max-width:780px;margin:0 auto;width:100%;box-sizing:border-box}
@@ -23,15 +26,15 @@
 .adm-row>label{font-family:'Silkscreen',monospace;font-size:11px;text-transform:uppercase;color:var(--muted)}
 .adm input,.adm textarea,.adm select{
   font-family:'Orbit',sans-serif;font-size:14px;
-  border:2px solid var(--border);padding:6px 8px;
-  background:var(--bg);color:var(--fg);width:100%;box-sizing:border-box}
+  border:2px solid var(--ink);padding:6px 8px;
+  background:var(--white);color:var(--ink);width:100%;box-sizing:border-box}
 .adm textarea{min-height:56px;resize:vertical}
-.adm input:focus,.adm textarea:focus,.adm select:focus{outline:2px solid var(--navy);outline-offset:-2px}
+.adm input:focus,.adm textarea:focus,.adm select:focus{outline:2px solid var(--bar);outline-offset:-2px}
 
 /* cards with collapse */
-.adm-card{border:2px solid var(--border);margin-bottom:12px;background:var(--bg)}
+.adm-card{border:2px solid var(--ink);margin-bottom:12px;background:var(--paper);box-shadow:2px 2px 0 var(--ink)}
 .adm-card-head{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;
-  background:var(--navy);color:var(--paper);cursor:pointer;user-select:none;gap:8px}
+  background:var(--bar);color:var(--paper);cursor:pointer;user-select:none;gap:8px}
 .adm-card-head:hover{opacity:.9}
 .adm-card-title{font-family:'Silkscreen',monospace;font-size:12px;flex:1}
 .adm-card-toggle{font-family:'Silkscreen',monospace;font-size:10px;opacity:.7;flex:none}
@@ -41,33 +44,34 @@
 .adm-card:not(.collapsed) .adm-card-toggle::after{content:'FOLD'}
 
 .adm-add{width:100%;border:2px dashed var(--muted);padding:8px;cursor:pointer;font-family:'Orbit',sans-serif;background:none;color:var(--muted)}
-.adm-add:hover{border-color:var(--fg);color:var(--fg)}
+.adm-add:hover{border-color:var(--ink);color:var(--ink)}
 .adm-rm{font-size:12px;cursor:pointer;background:none;border:1px solid var(--muted);padding:2px 8px;font-family:'Orbit',sans-serif;color:var(--red,#c00);flex:none}
 .adm-rm:hover{border-color:var(--red,#c00)}
-.adm-sec{font-family:'Silkscreen',monospace;font-size:12px;padding:8px 0;border-bottom:1px solid var(--border);margin-bottom:8px}
+.adm-sec{font-family:'Silkscreen',monospace;font-size:12px;padding:8px 0;border-bottom:1px solid var(--ink);margin-bottom:8px;color:var(--bar)}
 .adm-pair{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 @media(max-width:600px){.adm-pair{grid-template-columns:1fr}}
 .adm-msg{display:grid;grid-template-columns:90px 1fr 80px;gap:4px;align-items:start;margin-bottom:4px}
 @media(max-width:600px){.adm-msg{grid-template-columns:1fr}}
-.adm-saved{font-size:12px;margin-right:auto;align-self:center}
+.adm-saved{font-size:12px;margin-right:auto;align-self:center;font-family:'Silkscreen',monospace}
 .adm-hint{font-size:12px;color:var(--muted);margin-top:-4px}
 .adm-inline{display:flex;gap:4px;margin-bottom:4px}
 .adm-inline textarea{flex:1}
-.adm-conn{font-size:12px;padding:2px 8px}
+.adm-conn{font-size:12px;padding:2px 8px;font-family:'Silkscreen',monospace}
 
 /* tab badges */
-.tab-badge{font-family:'Silkscreen',monospace;font-size:9px;background:var(--navy);color:var(--paper);
+.tab-badge{font-family:'Silkscreen',monospace;font-size:9px;background:var(--bar);color:var(--paper);
   padding:1px 5px;margin-left:4px;vertical-align:middle}
-.tab[aria-pressed="true"] .tab-badge{background:var(--paper);color:var(--navy)}
+.tab[aria-pressed="true"] .tab-badge{background:var(--paper);color:var(--bar)}
 
 /* mobile header */
 @media(max-width:600px){
+  .adm-shell{border:none;box-shadow:none}
   .adm-bar-inner{flex-wrap:wrap;gap:4px}
   .adm-bar-inner .win-title{font-size:12px;width:100%;order:-1}
 }
 </style>
 </head>
-<body style="margin:0;overflow:hidden">
+<body>
 <div class="adm-shell">
   <div class="adm-bar">
     <div class="win-bar adm-bar-inner" style="gap:8px">
@@ -259,9 +263,6 @@ function render(){
 function rSite(){
   ed.innerHTML='<div class="adm">'+
     rw('TITLE',inp('site.title','사이트 제목'))+
-    rw('FOOTER',inp('site.footer','푸터 문구'))+
-    rw('NOTICE (주의사항)',inp('site.notice','주의사항 / 지뢰 안내'))+
-    rw('PAIR LINE (페어 한 줄)',inp('site.pairLine','페어 한 줄 소개'))+
     rw('LAST SYNC',inp('site.lastSync','YYYY.MM.DD'))+
     rw('CONTACT',inp('site.contact','방명록 / 연락처 링크'))+
     rw('BOOT INTRO',chk('site.bootIntro','입구 부팅 화면 사용'))+

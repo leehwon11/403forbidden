@@ -114,7 +114,6 @@
       <div class="home-foot">
         <span data-site="footer"></span>
         <span data-site="contact"></span>
-        <button type="button" class="btn btn--flat" id="btn-sound" style="font-size:11px;padding:2px 8px">[SOUND: ON]</button>
       </div>
     </div>
   </div>
@@ -263,6 +262,7 @@
 </div>
 
 <button type="button" class="notice-btn" id="notice-open" hidden>NOTICE</button>
+<a href="admin.html" class="notice-btn admin-btn" id="admin-link" hidden>ADMIN</a>
 
 <!-- ===== 스포일러 확인 모달 ===== -->
 <div class="modal-overlay" id="spoiler-modal" hidden>
@@ -511,6 +511,7 @@
     entry.hidden = true;
     appEl.hidden = false;
     document.getElementById('term-toggle').hidden = false;
+    document.getElementById('admin-link').hidden = false;
     navigate(location.hash.replace('#', '') || 'home');
     showNoticeOnEntry();
   });
@@ -520,6 +521,7 @@
     try { sessionStorage.removeItem('entered'); } catch (e2) {}
     appEl.hidden = true;
     entry.hidden = false;
+    document.getElementById('admin-link').hidden = true;
     knocks = 0;
     setOpen(false);
     history.replaceState(null, '', location.pathname);
@@ -966,6 +968,10 @@
         body.style.maxHeight = open ? body.scrollHeight + 'px' : '0';
         return;
       }
+      var st = e.target.closest('[data-action="stat"]');
+      if (st) { openStatWin(CHARACTERS[cur]); return; }
+      var ic = e.target.closest('[data-action="idcard"]');
+      if (ic) { openIdCard(CHARACTERS[cur]); return; }
       var sp = e.target.closest('[data-action="spoiler"]');
       if (sp) {
         var modal = document.getElementById('spoiler-modal');
@@ -1469,13 +1475,6 @@
     scrollBar.style.width = (h > 0 ? (window.scrollY / h * 100) : 0) + '%';
   }, { passive: true });
 
-  /* ======== 사운드 토글 ======== */
-  document.getElementById('btn-sound').addEventListener('click', function () {
-    soundOn = !soundOn;
-    this.textContent = soundOn ? '[SOUND: ON]' : '[SOUND: OFF]';
-    sfx('click');
-  });
-
   /* ======== 공지사항 모달 ======== */
   var noticeModal = document.getElementById('notice-modal');
   var noticeBtn = document.getElementById('notice-open');
@@ -1563,6 +1562,7 @@
     entry.hidden = true;
     appEl.hidden = false;
     document.getElementById('term-toggle').hidden = false;
+    document.getElementById('admin-link').hidden = false;
     navigate(location.hash.replace('#', '') || 'home');
     showNoticeOnEntry();
   }
