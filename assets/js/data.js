@@ -15,6 +15,9 @@ const SITE = {
   pairLine: '[여기에 페어 한 줄 소개]',
   lastSync: '[YYYY.MM.DD]',
   contact: '[방명록 / 연락처 링크]',
+  /* 공지사항 — 빈 문자열이면 공지 모달이 뜨지 않아요.
+     줄바꿈(\n)으로 문단을 나눌 수 있어요. */
+  broadcast: '[공지사항 내용을 여기에 적어요.]',
   bootIntro: true,   // false 로 바꾸면 입구의 부팅 화면을 건너뛰어요
   /* 부팅 시퀀스에 나오는 줄
      text: 화면에 뜨는 문장, cls: 'dim' / 'alert' / '' (비어두면 기본), wait: 대기 밀리초 */

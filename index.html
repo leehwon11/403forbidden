@@ -248,6 +248,22 @@
 
 </main>
 
+<!-- ===== 공지사항 모달 ===== -->
+<div class="notice-modal" id="notice-modal" hidden>
+  <div class="win" role="dialog" aria-modal="true" aria-labelledby="notice-title">
+    <div class="win-bar">
+      <span class="win-title" id="notice-title">SYSTEM NOTICE — /broadcast</span>
+      <span class="win-box" aria-hidden="true"></span>
+    </div>
+    <div class="notice-body" id="notice-body"></div>
+    <div class="notice-foot">
+      <button type="button" class="btn btn--dark" id="notice-close">[확인]</button>
+    </div>
+  </div>
+</div>
+
+<button type="button" class="notice-btn" id="notice-open" hidden>NOTICE</button>
+
 <!-- ===== 스포일러 확인 모달 ===== -->
 <div class="modal-overlay" id="spoiler-modal" hidden>
   <div class="win modal-box" role="dialog" aria-modal="true" aria-labelledby="spoiler-title">
@@ -496,6 +512,7 @@
     appEl.hidden = false;
     document.getElementById('term-toggle').hidden = false;
     navigate(location.hash.replace('#', '') || 'home');
+    showNoticeOnEntry();
   });
 
   document.getElementById('btn-logout').addEventListener('click', function (e) {
@@ -1468,6 +1485,76 @@
     sfx('click');
   });
 
+  /* ======== 공지사항 모달 ======== */
+  var noticeModal = document.getElementById('notice-modal');
+  var noticeBtn = document.getElementById('notice-open');
+  var noticeSeen = false;
+  try { noticeSeen = sessionStorage.getItem('notice-seen') === '1'; } catch (e) {}
+
+  function openNotice() {
+    var text = SITE.broadcast;
+    if (!text || text.indexOf('[') === 0) return;
+    document.getElementById('notice-body').innerHTML =
+      text.split('\n').map(function (line) { return '<p>' + esc(line) + '</p>'; }).join('');
+    noticeModal.hidden = false;
+    replay(noticeModal.querySelector('.win'), 'pop');
+    sfx('open');
+  }
+
+  function closeNotice() {
+    noticeModal.hidden = true;
+    sfx('close');
+    try { sessionStorage.setItem('notice-seen', '1'); } catch (e) {}
+    noticeSeen = true;
+  }
+
+  document.getElementById('notice-close').addEventListener('click', closeNotice);
+  noticeModal.addEventListener('click', function (e) { if (e.target === noticeModal) closeNotice(); });
+  noticeBtn.addEventListener('click', openNotice);
+
+  function showNoticeOnEntry() {
+    var text = SITE.broadcast;
+    if (!text || text.indexOf('[') === 0) return;
+    noticeBtn.hidden = false;
+    if (!noticeSeen) openNotice();
+  }
+
+  /* ======== 타임라인 스크롤 애니메이션 ======== */
+  var tlObserver = null;
+  function initTimelineObserver() {
+    if (tlObserver || reduce) return;
+    tlObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (ent) {
+        if (ent.isIntersecting) {
+          ent.target.classList.add('tl-visible');
+          tlObserver.unobserve(ent.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    document.querySelectorAll('.tl li').forEach(function (li) {
+      tlObserver.observe(li);
+    });
+  }
+
+  /* ======== 페이지 전환 애니메이션 ======== */
+  var currentPage = null;
+  var origNavigate = navigate;
+  navigate = function (name) {
+    if (reduce || !currentPage || currentPage.hidden) {
+      origNavigate(name);
+      currentPage = pages[name] || pages['404'];
+      if (name === 'timeline') setTimeout(initTimelineObserver, 100);
+      return;
+    }
+    currentPage.classList.add('page-exit');
+    setTimeout(function () {
+      currentPage.classList.remove('page-exit');
+      origNavigate(name);
+      currentPage = pages[name] || pages['404'];
+      if (name === 'timeline') setTimeout(initTimelineObserver, 100);
+    }, 180);
+  };
+
   /* ======== 초기화 ======== */
   fillSite();
 
@@ -1486,6 +1573,7 @@
     appEl.hidden = false;
     document.getElementById('term-toggle').hidden = false;
     navigate(location.hash.replace('#', '') || 'home');
+    showNoticeOnEntry();
   }
 })();
 </script>

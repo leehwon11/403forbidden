@@ -263,6 +263,9 @@ function rSite(){
     rw('LAST SYNC',inp('site.lastSync','YYYY.MM.DD'))+
     rw('CONTACT',inp('site.contact','방명록 / 연락처 링크'))+
     rw('BOOT INTRO',chk('site.bootIntro','입구 부팅 화면 사용'))+
+    '<div class="adm-sec">공지사항</div>'+
+    '<p class="adm-hint">[줄바꿈(\\n)으로 문단을 나눌 수 있어요. 빈 문자열이면 공지 모달이 뜨지 않아요.]</p>'+
+    rw('BROADCAST (공지사항)',area('site.broadcast','공지사항 내용을 여기에 적어요.',4))+
   '</div>';
 }
 
@@ -527,6 +530,7 @@ document.getElementById('btn-export').addEventListener('click',function(){
   L.push('  lastSync: '+q(s.lastSync)+',');
   L.push('  contact: '+q(s.contact)+',');
   L.push('  bootIntro: '+(s.bootIntro?'true':'false')+',');
+  L.push('  broadcast: '+q(s.broadcast||'')+',');
   L.push('  boot: [');
   (s.boot||[]).forEach(function(b,i){
     L.push("    { text: "+q(b.text)+", cls: "+q(b.cls)+", wait: "+(b.wait||0)+" }"+(i<(s.boot||[]).length-1?',':''));
