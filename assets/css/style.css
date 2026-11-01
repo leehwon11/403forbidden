@@ -342,10 +342,11 @@ a, button, [role="button"], label, select, summary { cursor: pointer; }
 
 /* ---------- 접힘 패널 ---------- */
 .collapse-head {
-  display: flex; align-items: center; gap: 8px;
+  display: flex; align-items: center; gap: 8px; width: 100%;
   font-family: var(--pixel); font-size: 12px; letter-spacing: .5px;
   padding: 10px 0; cursor: pointer; user-select: none;
-  border-bottom: 1px solid var(--ink);
+  background: none; color: inherit; border: none;
+  border-bottom: 1px solid var(--ink); text-align: left;
 }
 .collapse-head::before {
   content: '\25B6'; font-size: 9px; transition: transform .2s;
