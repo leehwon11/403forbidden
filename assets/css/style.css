@@ -651,7 +651,7 @@ body::after {
 }
 .notice-btn:hover { background: var(--bar); border-color: var(--paper); }
 .notice-btn::before { content: '\25A0'; font-size: 8px; }
-.admin-btn { left: auto; right: 16px; text-decoration: none; }
+.admin-btn { left: auto; right: 16px; bottom: 60px; text-decoration: none; }
 .admin-btn::before { content: '\25B6'; }
 
 /* ---------- 공지 모달 ---------- */
@@ -696,5 +696,5 @@ body::after {
   .explorer-head { grid-template-columns: 24px 1fr 60px; }
   .explorer-meta:nth-child(n+4) { display: none; }
   .notice-btn { left: 8px; bottom: 8px; font-size: 10px; padding: 0 8px; min-height: 32px; }
-  .admin-btn { right: 8px; left: auto; }
+  .admin-btn { right: 8px; left: auto; bottom: 52px; }
 }
