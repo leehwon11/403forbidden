@@ -87,6 +87,7 @@
       <button type="button" class="tab" data-tab="chats" aria-pressed="false">메신저<span class="tab-badge" id="badge-chats"></span></button>
       <button type="button" class="tab" data-tab="timeline" aria-pressed="false">타임라인<span class="tab-badge" id="badge-timeline"></span></button>
       <button type="button" class="tab" data-tab="boot" aria-pressed="false">부팅/입구</button>
+      <button type="button" class="tab" data-tab="terminal" aria-pressed="false">터미널</button>
     </div>
   </div>
   <div class="adm-scroll" id="adm-scroll">
@@ -117,7 +118,7 @@
 (async function(){
 
 /* ======== 나루 SDK ======== */
-var COLS=['site','characters','commissions','pairframes','logs','chats','timeline'];
+var COLS=['site','characters','commissions','pairframes','logs','chats','timeline','terminal'];
 var naru=null,adm=null;
 try{
   var mod=await import('https://sdk.naru.pub/sdk/1.0.0/naru.js');
@@ -159,6 +160,7 @@ async function loadFromNaru(){
     if(docs[4])D.logs=docs[4].data;
     if(docs[5])D.chats=docs[5].data;
     if(docs[6])D.timeline=docs[6].data;
+    if(docs[7])D.terminal=docs[7].data;
     persist();return true;
   }catch(e){return false}
 }
@@ -190,8 +192,8 @@ document.getElementById('gate-login').addEventListener('click',function(){
 document.getElementById('btn-save').addEventListener('click',async function(){
   if(!adm)return;
   try{
-    var keys=['site','characters','commissions','pairframes','logs','chats','timeline'];
-    var vals=[D.site,D.characters,D.commissions,D.pairframes,D.logs,D.chats,D.timeline];
+    var keys=['site','characters','commissions','pairframes','logs','chats','timeline','terminal'];
+    var vals=[D.site,D.characters,D.commissions,D.pairframes,D.logs,D.chats,D.timeline,D.terminal];
     await adm.batch(keys.map(function(k,i){
       return {collection:k,set:{id:'config',data:vals[i]}};
     }));
@@ -206,7 +208,7 @@ document.getElementById('btn-save').addEventListener('click',async function(){
 /* ======== 데이터 ======== */
 var D=JSON.parse(JSON.stringify({
   site:SITE,characters:CHARACTERS,commissions:COMMISSIONS,
-  pairframes:PAIRFRAMES,logs:LOGS,chats:CHATS,timeline:TIMELINE
+  pairframes:PAIRFRAMES,logs:LOGS,chats:CHATS,timeline:TIMELINE,terminal:TERMINAL
 }));
 try{var sv=localStorage.getItem('admin403');if(sv)D=JSON.parse(sv)}catch(e){}
 
@@ -247,7 +249,7 @@ function updateBadges(){
 }
 
 function render(){
-  var fn={site:rSite,characters:rChars,commissions:rComm,pairframes:rPair,logs:rLogs,chats:rChats,timeline:rTL,boot:rBoot};
+  var fn={site:rSite,characters:rChars,commissions:rComm,pairframes:rPair,logs:rLogs,chats:rChats,timeline:rTL,boot:rBoot,terminal:rTerm};
   (fn[curTab]||rSite)();
   updateBadges();
   var scroll=document.getElementById('adm-scroll');
@@ -441,6 +443,38 @@ function rBoot(){
   '</div>';
 }
 
+function rTerm(){
+  if(!D.terminal) D.terminal={};
+  var groups=[
+    {key:'pingHaein',label:'PING 해인 (모해인 / haein / 해인)'},
+    {key:'pingDohun',label:'PING 도훈 (현도훈 / dohun / 도훈)'},
+    {key:'pingUs',label:'PING us (us / 우리)'},
+    {key:'pingDefault',label:'PING 기본 (알 수 없는 대상)'},
+    {key:'readme',label:'CAT README (readme 파일 내용)'},
+    {key:'accessUs',label:'ACCESS us (/us/ 접근 요청)'},
+    {key:'accessAdmin',label:'ACCESS admin (관리자 접근)'},
+    {key:'accessDefault',label:'ACCESS 기본 (알 수 없는 경로)'},
+    {key:'whoami',label:'WHOAMI (접속자 정보)'}
+  ];
+  var html='<div class="adm">'+
+    '<p class="adm-hint">[이스터에그 터미널의 명령어 응답을 수정합니다.]<br>[cls: dim(흐리게) / alert(빨강) / info(파랑) / 빈칸(기본)]</p>';
+  groups.forEach(function(g){
+    var arr=D.terminal[g.key]||[];
+    html+='<div class="adm-sec">'+g.label+'</div>';
+    arr.forEach(function(line,i){
+      var p='terminal.'+g.key+'.'+i;
+      html+='<div class="adm-pair" style="margin-bottom:4px">'+
+        '<input data-p="'+p+'.text" value="'+esc(line.text||'')+'" placeholder="응답 문구">'+
+        '<div style="display:flex;gap:4px">'+
+        sel(p+'.cls',[['','기본'],['dim','dim'],['alert','alert'],['info','info']])+
+        '<button type="button" class="adm-rm" data-action="rm-term" data-key="'+g.key+'" data-i="'+i+'">X</button>'+
+        '</div></div>';
+    });
+    html+='<button type="button" class="adm-add" data-action="add-term" data-key="'+g.key+'">+ 응답 줄 추가</button>';
+  });
+  ed.innerHTML=html+'</div>';
+}
+
 /* ---- 이벤트 ---- */
 ed.addEventListener('input',function(e){
   var p=e.target.dataset.p;if(!p)return;
@@ -498,6 +532,8 @@ ed.addEventListener('click',function(e){
   if(a==='rm-knock'){D.site.knock.splice(+b.dataset.i,1);persist();render();}
   if(a==='add-wait'){if(!D.site.waitSteps)D.site.waitSteps=[];D.site.waitSteps.push({text:'',wait:500});persist();render();}
   if(a==='rm-wait'){D.site.waitSteps.splice(+b.dataset.i,1);persist();render();}
+  if(a==='add-term'){if(!D.terminal)D.terminal={};var tk=b.dataset.key;if(!D.terminal[tk])D.terminal[tk]=[];D.terminal[tk].push({text:'',cls:''});persist();render();}
+  if(a==='rm-term'){if(D.terminal&&D.terminal[b.dataset.key])D.terminal[b.dataset.key].splice(+b.dataset.i,1);persist();render();}
 });
 
 document.getElementById('tabs').addEventListener('click',function(e){
@@ -619,6 +655,20 @@ document.getElementById('btn-export').addEventListener('click',function(){
   });
   L.push('];');
   L.push('');
+  L.push("/* ---------- 터미널 응답 ---------- */");
+  L.push('const TERMINAL = {');
+  var termKeys=['pingHaein','pingDohun','pingUs','pingDefault','readme','accessUs','accessAdmin','accessDefault','whoami'];
+  var tm=D.terminal||{};
+  termKeys.forEach(function(key,ki){
+    var arr=tm[key]||[];
+    L.push('  '+key+': [');
+    arr.forEach(function(line,i){
+      L.push("    { text: "+q(line.text)+", cls: "+q(line.cls)+" }"+(i<arr.length-1?',':''));
+    });
+    L.push('  ]'+(ki<termKeys.length-1?',':''));
+  });
+  L.push('};');
+  L.push('');
 
   var blob=new Blob([L.join('\n')],{type:'text/javascript'});
   var a=document.createElement('a');
@@ -636,7 +686,7 @@ document.getElementById('btn-reset').addEventListener('click',async function(){
   }
   D=JSON.parse(JSON.stringify({
     site:SITE,characters:CHARACTERS,commissions:COMMISSIONS,
-    pairframes:PAIRFRAMES,logs:LOGS,chats:CHATS,timeline:TIMELINE
+    pairframes:PAIRFRAMES,logs:LOGS,chats:CHATS,timeline:TIMELINE,terminal:TERMINAL
   }));
   try{localStorage.removeItem('admin403')}catch(e){}
   render();
