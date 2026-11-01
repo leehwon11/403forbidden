@@ -1564,7 +1564,10 @@
     if (!ok) return;
     fillSite();
     Object.keys(inited).forEach(function (k) { delete inited[k]; });
-    if (!appEl.hidden) navigate(location.hash.replace('#', '') || 'home');
+    if (!appEl.hidden) {
+      navigate(location.hash.replace('#', '') || 'home');
+      showNoticeOnEntry();
+    }
   });
 
   var entered = false;
