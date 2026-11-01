@@ -1113,8 +1113,8 @@
   (function () {
     var dragging = null, offX = 0, offY = 0;
 
-    function startDrag(bar, clientX, clientY) {
-      if (bar.closest('a') || bar.closest('button')) return false;
+    function startDrag(bar, clientX, clientY, target) {
+      if (target && (target.closest('a') || target.closest('button'))) return false;
       var win = bar.closest('.win');
       if (!win) return false;
       dragging = win;
@@ -1141,7 +1141,7 @@
 
     document.addEventListener('mousedown', function (e) {
       var bar = e.target.closest('.win-bar');
-      if (bar && startDrag(bar, e.clientX, e.clientY)) e.preventDefault();
+      if (bar && startDrag(bar, e.clientX, e.clientY, e.target)) e.preventDefault();
     });
     document.addEventListener('mousemove', function (e) { moveDrag(e.clientX, e.clientY); });
     document.addEventListener('mouseup', endDrag);
@@ -1150,7 +1150,7 @@
       var bar = e.target.closest('.win-bar');
       if (!bar) return;
       var t = e.touches[0];
-      if (startDrag(bar, t.clientX, t.clientY)) e.preventDefault();
+      if (startDrag(bar, t.clientX, t.clientY, e.target)) e.preventDefault();
     }, { passive: false });
     document.addEventListener('touchmove', function (e) {
       if (!dragging) return;
