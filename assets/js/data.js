@@ -219,10 +219,5 @@ const TERMINAL = {
   ],
   accessDefault: [
     { text: '[404 NOT FOUND — 요청한 경로가 존재하지 않습니다.]', cls: 'alert' }
-  ],
-  whoami: [
-    { text: '권한: VISITOR (읽기 전용)', cls: '' },
-    { text: '등급: 미등록', cls: '' },
-    { text: '[관리자 권한이 필요한 작업은 수행할 수 없습니다.]', cls: 'dim' }
   ]
 };

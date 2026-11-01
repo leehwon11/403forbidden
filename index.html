@@ -364,8 +364,8 @@
         new Promise(function (_, r) { setTimeout(r, 3000); })
       ]);
       var naru = mod.createNaru();
-      var COLS = ['site','characters','commissions','pairframes','logs','chats','timeline'];
-      var GLOBALS = [SITE, CHARACTERS, COMMISSIONS, PAIRFRAMES, LOGS, CHATS, TIMELINE];
+      var COLS = ['site','characters','commissions','pairframes','logs','chats','timeline','terminal'];
+      var GLOBALS = [SITE, CHARACTERS, COMMISSIONS, PAIRFRAMES, LOGS, CHATS, TIMELINE, TERMINAL];
       var docs = await Promise.all(COLS.map(function (c) {
         return naru.collection(c).get('config').catch(function () { return null; });
       }));
@@ -1308,7 +1308,9 @@
       },
       whoami: function () {
         termLine('[접속자 정보 조회]', 'info');
-        (TERMINAL.whoami || []).forEach(function (line) { termLine('  ' + line.text, line.cls || ''); });
+        termLine('  권한: VISITOR (읽기 전용)', '');
+        termLine('  등급: 미등록', '');
+        termLine('  [관리자 권한이 필요한 작업은 수행할 수 없습니다.]', 'dim');
       },
       ls: function () {
         termLine('[/us/ 디렉토리 파일 목록]', 'info');
