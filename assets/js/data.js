@@ -12,7 +12,6 @@ const SITE = {
   title: '403 Forbidden',
   footer: '「어린 신인데 키워주시죠」 현도훈(자캐) × 모해인 · 드림 개인 홈페이지',
   notice: '[주의사항 / 지뢰 안내 한 줄]',
-  pairLine: '[여기에 페어 한 줄 소개]',
   lastSync: '[YYYY.MM.DD]',
   contact: '[방명록 / 연락처 링크]',
   /* 공지사항 — 빈 문자열이면 공지 모달이 뜨지 않아요.
