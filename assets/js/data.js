@@ -15,6 +15,9 @@ const SITE = {
   pairLine: '[여기에 페어 한 줄 소개]',
   lastSync: '[YYYY.MM.DD]',
   contact: '[방명록 / 연락처 링크]',
+  /* 공지사항 — 빈 문자열이면 공지 모달이 뜨지 않아요.
+     줄바꿈(\n)으로 문단을 나눌 수 있어요. */
+  broadcast: '[공지사항 내용을 여기에 적어요.]',
   bootIntro: true,   // false 로 바꾸면 입구의 부팅 화면을 건너뛰어요
   /* 부팅 시퀀스에 나오는 줄
      text: 화면에 뜨는 문장, cls: 'dim' / 'alert' / '' (비어두면 기본), wait: 대기 밀리초 */
@@ -179,3 +182,46 @@ const TIMELINE = [
   { date: '[YYYY.MM]', code: '102 PROCESSING', type: '',     title: '[사건 제목]',             desc: '[사건 설명]' },
   { date: '[YYYY.MM]', code: '200 OK',         type: 'ok',   title: '[문이 열린 날]',          desc: '[사건 설명]' }
 ];
+
+/* ---------- 터미널 응답 ----------
+   이스터에그 터미널의 명령어 응답을 수정할 수 있어요.
+   text: 화면에 뜨는 문장, cls: 'dim' / 'alert' / 'info' / '' (빈칸이면 기본) */
+const TERMINAL = {
+  pingHaein: [
+    { text: '패킷 전송 중...', cls: 'dim' },
+    { text: '응답 없음 — 403 FORBIDDEN', cls: 'alert' },
+    { text: '응답 없음 — 403 FORBIDDEN', cls: 'alert' },
+    { text: '[연결이 거부되었습니다. 권한은 확인되었으나 접근할 수 없습니다.]', cls: 'alert' }
+  ],
+  pingDohun: [
+    { text: '패킷 전송 중...', cls: 'dim' },
+    { text: '응답 대기 중 — 425 TOO EARLY', cls: '' },
+    { text: '[때가 아닙니다. 나중에 다시 시도해 주세요.]', cls: '' }
+  ],
+  pingUs: [
+    { text: '[\'us\' 영역은 아직 열리지 않았습니다.]', cls: 'alert' }
+  ],
+  pingDefault: [
+    { text: '[등록되지 않은 대상입니다. 캐릭터 데이터베이스를 확인해 주세요.]', cls: 'alert' }
+  ],
+  readme: [
+    { text: '403 Forbidden', cls: '' },
+    { text: '[권한은 있지만 접근할 수 없는 관계.]', cls: '' },
+    { text: '[단, 문은 언젠가 반드시 열린다.]', cls: '' }
+  ],
+  accessUs: [
+    { text: '[경고: 접근이 거부되었습니다 — 403 FORBIDDEN]', cls: 'alert' },
+    { text: '[조건이 충족되지 않았습니다: 때]', cls: 'alert' }
+  ],
+  accessAdmin: [
+    { text: '[401 UNAUTHORIZED — 인증이 필요합니다.]', cls: 'alert' }
+  ],
+  accessDefault: [
+    { text: '[404 NOT FOUND — 요청한 경로가 존재하지 않습니다.]', cls: 'alert' }
+  ],
+  whoami: [
+    { text: '권한: VISITOR (읽기 전용)', cls: '' },
+    { text: '등급: 미등록', cls: '' },
+    { text: '[관리자 권한이 필요한 작업은 수행할 수 없습니다.]', cls: 'dim' }
+  ]
+};

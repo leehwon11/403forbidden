@@ -114,7 +114,6 @@
       <div class="home-foot">
         <span data-site="footer"></span>
         <span data-site="contact"></span>
-        <button type="button" class="btn btn--flat" id="btn-sound" style="font-size:11px;padding:2px 8px">[SOUND: ON]</button>
       </div>
     </div>
   </div>
@@ -247,6 +246,23 @@
   </div>
 
 </main>
+
+<!-- ===== 공지사항 모달 ===== -->
+<div class="notice-modal" id="notice-modal" hidden>
+  <div class="win" role="dialog" aria-modal="true" aria-labelledby="notice-title">
+    <div class="win-bar">
+      <span class="win-title" id="notice-title">SYSTEM NOTICE — /broadcast</span>
+      <span class="win-box" aria-hidden="true"></span>
+    </div>
+    <div class="notice-body" id="notice-body"></div>
+    <div class="notice-foot">
+      <button type="button" class="btn btn--dark" id="notice-close">[확인]</button>
+    </div>
+  </div>
+</div>
+
+<button type="button" class="notice-btn" id="notice-open" hidden>NOTICE</button>
+<a href="admin.html" class="notice-btn admin-btn" id="admin-link" hidden>ADMIN</a>
 
 <!-- ===== 스포일러 확인 모달 ===== -->
 <div class="modal-overlay" id="spoiler-modal" hidden>
@@ -495,7 +511,9 @@
     entry.hidden = true;
     appEl.hidden = false;
     document.getElementById('term-toggle').hidden = false;
+    document.getElementById('admin-link').hidden = false;
     navigate(location.hash.replace('#', '') || 'home');
+    showNoticeOnEntry();
   });
 
   document.getElementById('btn-logout').addEventListener('click', function (e) {
@@ -503,6 +521,7 @@
     try { sessionStorage.removeItem('entered'); } catch (e2) {}
     appEl.hidden = true;
     entry.hidden = false;
+    document.getElementById('admin-link').hidden = true;
     knocks = 0;
     setOpen(false);
     history.replaceState(null, '', location.pathname);
@@ -949,6 +968,10 @@
         body.style.maxHeight = open ? body.scrollHeight + 'px' : '0';
         return;
       }
+      var st = e.target.closest('[data-action="stat"]');
+      if (st) { openStatWin(CHARACTERS[cur]); return; }
+      var ic = e.target.closest('[data-action="idcard"]');
+      if (ic) { openIdCard(CHARACTERS[cur]); return; }
       var sp = e.target.closest('[data-action="spoiler"]');
       if (sp) {
         var modal = document.getElementById('spoiler-modal');
@@ -1227,6 +1250,12 @@
     termLine('[help 를 입력하면 사용 가능한 명령어를 확인할 수 있습니다.]', 'dim');
     termLine('', '');
 
+    function termSeq(lines) {
+      (lines || []).forEach(function (line, i) {
+        setTimeout(function () { termLine('  ' + line.text, line.cls || ''); }, (i + 1) * 350);
+      });
+    }
+
     var commands = {
       help: function () {
         termLine('[사용 가능한 명령어]', 'info');
@@ -1257,30 +1286,17 @@
         var target = args.join(' ').trim();
         if (!target) { termLine('[오류: 대상을 지정해 주세요. 예) ping 모해인]', 'alert'); return; }
         var t = target.toLowerCase();
-        if (t === '모해인' || t === 'haein' || t === '해인') {
-          termLine('[ping ' + target + ']', '');
-          termLine('  패킷 전송 중...', 'dim');
-          setTimeout(function () { termLine('  응답 없음 — 403 FORBIDDEN', 'alert'); }, 400);
-          setTimeout(function () { termLine('  응답 없음 — 403 FORBIDDEN', 'alert'); }, 700);
-          setTimeout(function () { termLine('  [연결이 거부되었습니다. 권한은 확인되었으나 접근할 수 없습니다.]', 'alert'); }, 1100);
-        } else if (t === '현도훈' || t === 'dohun' || t === '도훈') {
-          termLine('[ping ' + target + ']', '');
-          termLine('  패킷 전송 중...', 'dim');
-          setTimeout(function () { termLine('  응답 대기 중 — 425 TOO EARLY', ''); }, 400);
-          setTimeout(function () { termLine('  [때가 아닙니다. 나중에 다시 시도해 주세요.]', ''); }, 800);
-        } else if (t === 'us' || t === '우리') {
-          termLine('[ping ' + target + ']', '');
-          setTimeout(function () { termLine('  [\'us\' 영역은 아직 열리지 않았습니다.]', 'alert'); }, 500);
-        } else {
-          termLine('[ping ' + target + ']', '');
-          setTimeout(function () { termLine('  [등록되지 않은 대상입니다. 캐릭터 데이터베이스를 확인해 주세요.]', 'alert'); }, 400);
-        }
+        var lines;
+        if (t === '모해인' || t === 'haein' || t === '해인') lines = TERMINAL.pingHaein;
+        else if (t === '현도훈' || t === 'dohun' || t === '도훈') lines = TERMINAL.pingDohun;
+        else if (t === 'us' || t === '우리') lines = TERMINAL.pingUs;
+        else lines = TERMINAL.pingDefault;
+        termLine('[ping ' + target + ']', '');
+        termSeq(lines);
       },
       whoami: function () {
         termLine('[접속자 정보 조회]', 'info');
-        termLine('  권한: VISITOR (읽기 전용)', '');
-        termLine('  등급: 미등록', '');
-        termLine('  [관리자 권한이 필요한 작업은 수행할 수 없습니다.]', 'dim');
+        (TERMINAL.whoami || []).forEach(function (line) { termLine('  ' + line.text, line.cls || ''); });
       },
       ls: function () {
         termLine('[/us/ 디렉토리 파일 목록]', 'info');
@@ -1296,10 +1312,7 @@
         if (!f) { termLine('[오류: 파일명을 지정해 주세요.]', 'alert'); return; }
         if (f === 'readme' || f === 'readme.txt') {
           termLine('[readme.txt]', 'info');
-          termLine('  403 Forbidden', '');
-          termLine('  ' + SITE.footer, '');
-          termLine('  [권한은 있지만 접근할 수 없는 관계.]', '');
-          termLine('  [단, 문은 언젠가 반드시 열린다.]', '');
+          (TERMINAL.readme || []).forEach(function (line) { termLine('  ' + line.text, line.cls || ''); });
         } else if (f === 'status' || f === 'status.log') {
           termLine('[status.log]', 'info');
           TIMELINE.forEach(function (ev) {
@@ -1313,17 +1326,18 @@
       access: function (args) {
         var path = args.join(' ').trim().toLowerCase();
         if (!path) { termLine('[오류: 경로를 지정해 주세요.]', 'alert'); return; }
+        var lines;
         if (path === 'us' || path === '/us' || path === '/us/') {
           termLine('[/us/ 영역에 대한 접근을 요청합니다...]', '');
-          setTimeout(function () { termLine('[경고: 접근이 거부되었습니다 — 403 FORBIDDEN]', 'alert'); }, 500);
-          setTimeout(function () { termLine('[조건이 충족되지 않았습니다: 때]', 'alert'); }, 900);
+          lines = TERMINAL.accessUs;
         } else if (path === 'admin' || path === '/admin') {
           termLine('[관리자 영역 접근 시도...]', '');
-          setTimeout(function () { termLine('[401 UNAUTHORIZED — 인증이 필요합니다.]', 'alert'); }, 500);
+          lines = TERMINAL.accessAdmin;
         } else {
           termLine('[/' + path + '/ 에 대한 접근을 요청합니다...]', '');
-          setTimeout(function () { termLine('[404 NOT FOUND — 요청한 경로가 존재하지 않습니다.]', 'alert'); }, 500);
+          lines = TERMINAL.accessDefault;
         }
+        termSeq(lines);
       },
       date: function () {
         var now = new Date();
@@ -1461,12 +1475,75 @@
     scrollBar.style.width = (h > 0 ? (window.scrollY / h * 100) : 0) + '%';
   }, { passive: true });
 
-  /* ======== 사운드 토글 ======== */
-  document.getElementById('btn-sound').addEventListener('click', function () {
-    soundOn = !soundOn;
-    this.textContent = soundOn ? '[SOUND: ON]' : '[SOUND: OFF]';
-    sfx('click');
-  });
+  /* ======== 공지사항 모달 ======== */
+  var noticeModal = document.getElementById('notice-modal');
+  var noticeBtn = document.getElementById('notice-open');
+  var noticeSeen = false;
+  try { noticeSeen = sessionStorage.getItem('notice-seen') === '1'; } catch (e) {}
+
+  function openNotice() {
+    var text = SITE.broadcast;
+    if (!text || text.indexOf('[') === 0) return;
+    document.getElementById('notice-body').innerHTML =
+      text.split('\n').map(function (line) { return '<p>' + esc(line) + '</p>'; }).join('');
+    noticeModal.hidden = false;
+    replay(noticeModal.querySelector('.win'), 'pop');
+    sfx('open');
+  }
+
+  function closeNotice() {
+    noticeModal.hidden = true;
+    sfx('close');
+    try { sessionStorage.setItem('notice-seen', '1'); } catch (e) {}
+    noticeSeen = true;
+  }
+
+  document.getElementById('notice-close').addEventListener('click', closeNotice);
+  noticeModal.addEventListener('click', function (e) { if (e.target === noticeModal) closeNotice(); });
+  noticeBtn.addEventListener('click', openNotice);
+
+  function showNoticeOnEntry() {
+    var text = SITE.broadcast;
+    if (!text || text.indexOf('[') === 0) return;
+    noticeBtn.hidden = false;
+    if (!noticeSeen) openNotice();
+  }
+
+  /* ======== 타임라인 스크롤 애니메이션 ======== */
+  var tlObserver = null;
+  function initTimelineObserver() {
+    if (tlObserver || reduce) return;
+    tlObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (ent) {
+        if (ent.isIntersecting) {
+          ent.target.classList.add('tl-visible');
+          tlObserver.unobserve(ent.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    document.querySelectorAll('.tl li').forEach(function (li) {
+      tlObserver.observe(li);
+    });
+  }
+
+  /* ======== 페이지 전환 애니메이션 ======== */
+  var currentPage = null;
+  var origNavigate = navigate;
+  navigate = function (name) {
+    if (reduce || !currentPage || currentPage.hidden) {
+      origNavigate(name);
+      currentPage = pages[name] || pages['404'];
+      if (name === 'timeline') setTimeout(initTimelineObserver, 100);
+      return;
+    }
+    currentPage.classList.add('page-exit');
+    setTimeout(function () {
+      currentPage.classList.remove('page-exit');
+      origNavigate(name);
+      currentPage = pages[name] || pages['404'];
+      if (name === 'timeline') setTimeout(initTimelineObserver, 100);
+    }, 180);
+  };
 
   /* ======== 초기화 ======== */
   fillSite();
@@ -1485,7 +1562,9 @@
     entry.hidden = true;
     appEl.hidden = false;
     document.getElementById('term-toggle').hidden = false;
+    document.getElementById('admin-link').hidden = false;
     navigate(location.hash.replace('#', '') || 'home');
+    showNoticeOnEntry();
   }
 })();
 </script>

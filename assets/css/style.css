@@ -607,6 +607,67 @@ a, button, [role="button"], label, select, summary { cursor: pointer; }
   font-family: var(--pixel); font-size: 10px; color: var(--muted);
 }
 
+/* ---------- 텍스트 선택 색상 ---------- */
+::selection { background: var(--bar); color: var(--white); }
+::-moz-selection { background: var(--bar); color: var(--white); }
+
+/* ---------- 스크롤바 ---------- */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--desk); }
+::-webkit-scrollbar-thumb { background: var(--muted); border: 2px solid var(--desk); }
+::-webkit-scrollbar-thumb:hover { background: var(--ink); }
+::-webkit-scrollbar-corner { background: var(--desk); }
+* { scrollbar-width: thin; scrollbar-color: var(--muted) var(--desk); }
+
+/* ---------- 홈 타일 hover ---------- */
+.app { transition: transform .15s ease, box-shadow .15s ease; }
+.app:hover { transform: translate(-2px, -2px); }
+.app:hover .app-icon { animation: rgb .3s steps(3); }
+.app:active { transform: translate(1px, 1px); box-shadow: 1px 1px 0 var(--ink); }
+
+/* ---------- 노이즈 오버레이 ---------- */
+body::after {
+  content: ''; position: fixed; inset: 0; z-index: 9998; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: .025; mix-blend-mode: overlay;
+}
+
+/* ---------- 타임라인 스크롤 등장 ---------- */
+.tl li { opacity: 0; transform: translateY(16px); transition: opacity .4s ease, transform .4s ease; }
+.tl li.tl-visible { opacity: 1; transform: none; }
+
+/* ---------- 페이지 전환 ---------- */
+.page-exit { animation: pageOut .2s ease forwards; }
+@keyframes pageOut { to { opacity: 0; transform: translateY(-8px); } }
+
+/* ---------- 공지사항 버튼 ---------- */
+.notice-btn {
+  position: fixed; left: 16px; bottom: 16px; z-index: 30;
+  min-height: 36px; padding: 0 12px;
+  background: var(--ink); color: var(--paper);
+  border: 2px solid var(--muted); box-shadow: 2px 2px 0 var(--muted);
+  font-family: var(--pixel); font-size: 11px; letter-spacing: .5px;
+  cursor: pointer; display: flex; align-items: center; gap: 6px;
+}
+.notice-btn:hover { background: var(--bar); border-color: var(--paper); }
+.notice-btn::before { content: '\25A0'; font-size: 8px; }
+.admin-btn { left: auto; right: 16px; text-decoration: none; }
+.admin-btn::before { content: '\25B6'; }
+
+/* ---------- 공지 모달 ---------- */
+.notice-modal {
+  position: fixed; inset: 0; z-index: 55;
+  background: rgba(11, 13, 16, .55);
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+  animation: fade .2s ease-out;
+}
+.notice-modal[hidden] { display: none; }
+.notice-modal .win { width: 100%; max-width: 520px; box-shadow: 8px 8px 0 var(--ink); animation: pop .3s cubic-bezier(.2, .9, .3, 1.2); }
+.notice-body { padding: 24px; font-size: 14px; line-height: 1.9; }
+.notice-body p { margin: 0 0 12px; }
+.notice-body p:last-child { margin: 0; }
+.notice-foot { padding: 0 24px 20px; display: flex; justify-content: flex-end; }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
   .toast { display: none; }
@@ -634,4 +695,6 @@ a, button, [role="button"], label, select, summary { cursor: pointer; }
   .explorer-row { grid-template-columns: 24px 1fr 60px; }
   .explorer-head { grid-template-columns: 24px 1fr 60px; }
   .explorer-meta:nth-child(n+4) { display: none; }
+  .notice-btn { left: 8px; bottom: 8px; font-size: 10px; padding: 0 8px; min-height: 32px; }
+  .admin-btn { right: 8px; left: auto; }
 }
