@@ -17,8 +17,8 @@ body{margin:0;overflow:hidden;background:var(--desk)}
 .adm-bar{flex:none}
 .adm-tabs-wrap{flex:none;border-bottom:2px solid var(--ink);background:var(--paper);padding:0}
 .adm-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;background:var(--sheet,var(--paper))}
-.adm-foot{flex:none;display:flex;gap:8px;padding:10px 16px;justify-content:flex-end;flex-wrap:wrap;
-  border-top:2px solid var(--ink);background:var(--paper)}
+.adm-foot{display:flex;gap:8px;padding:16px;justify-content:flex-end;flex-wrap:wrap;
+  border-top:2px solid var(--ink);background:var(--paper);margin-top:auto}
 
 /* form elements */
 .adm{padding:16px;display:flex;flex-direction:column;gap:12px;max-width:780px;margin:0 auto;width:100%;box-sizing:border-box}
@@ -90,18 +90,19 @@ body{margin:0;overflow:hidden;background:var(--desk)}
       <button type="button" class="tab" data-tab="logs" aria-pressed="false">글 로그<span class="tab-badge" id="badge-logs"></span></button>
       <button type="button" class="tab" data-tab="chats" aria-pressed="false">메신저<span class="tab-badge" id="badge-chats"></span></button>
       <button type="button" class="tab" data-tab="timeline" aria-pressed="false">타임라인<span class="tab-badge" id="badge-timeline"></span></button>
-      <button type="button" class="tab" data-tab="boot" aria-pressed="false">부팅/입구</button>
+      <button type="button" class="tab" data-tab="boot" aria-pressed="false">부팅</button>
+      <button type="button" class="tab" data-tab="entry" aria-pressed="false">입구</button>
       <button type="button" class="tab" data-tab="terminal" aria-pressed="false">터미널</button>
     </div>
   </div>
   <div class="adm-scroll" id="adm-scroll">
     <div id="ed"></div>
-  </div>
-  <div class="adm-foot">
-    <span class="adm-saved" id="status"></span>
-    <button type="button" class="btn btn--dark" id="btn-save" disabled>저장</button>
-    <button type="button" class="btn" id="btn-reset">초기화</button>
-    <button type="button" class="btn" id="btn-export">data.js 내보내기</button>
+    <div class="adm-foot">
+      <span class="adm-saved" id="status"></span>
+      <button type="button" class="btn btn--dark" id="btn-save" disabled>저장</button>
+      <button type="button" class="btn" id="btn-reset">초기화</button>
+      <button type="button" class="btn" id="btn-export">data.js 내보내기</button>
+    </div>
   </div>
 </div>
 <div id="auth-gate" style="position:fixed;inset:0;z-index:9999;background:var(--desk);display:flex;align-items:center;justify-content:center">
@@ -253,7 +254,7 @@ function updateBadges(){
 }
 
 function render(){
-  var fn={site:rSite,characters:rChars,commissions:rComm,pairframes:rPair,logs:rLogs,chats:rChats,timeline:rTL,boot:rBoot,terminal:rTerm};
+  var fn={site:rSite,characters:rChars,commissions:rComm,pairframes:rPair,logs:rLogs,chats:rChats,timeline:rTL,boot:rBoot,entry:rEntry,terminal:rTerm};
   (fn[curTab]||rSite)();
   updateBadges();
   var scroll=document.getElementById('adm-scroll');
@@ -404,7 +405,6 @@ function rTL(){
 
 function rBoot(){
   if(!D.site.boot) D.site.boot=[];
-  if(!D.site.knock) D.site.knock=[];
   ed.innerHTML='<div class="adm">'+
     '<div class="adm-sec">부팅 시퀀스</div>'+
     '<p class="adm-hint">[부팅 화면에 순서대로 나오는 줄입니다. cls: dim(흐리게) / alert(빨강) / 빈칸(기본)]</p>'+
@@ -420,7 +420,16 @@ function rBoot(){
         '</div></div>';
     }).join('')+
     '<button type="button" class="adm-add" data-action="add-boot">+ 부팅 줄 추가</button>'+
-    '<div class="adm-sec" style="margin-top:16px">입구 재시도 문구 (KNOCK)</div>'+
+  '</div>';
+}
+
+function rEntry(){
+  if(!D.site.knock) D.site.knock=[];
+  ed.innerHTML='<div class="adm">'+
+    '<div class="adm-sec">입구 이미지</div>'+
+    '<p class="adm-hint">[경고창에 표시할 이미지입니다. 빈칸이면 기본 자물쇠 아이콘을 사용합니다.]</p>'+
+    rw('ENTRY IMAGE',imgInp('site.entryImg','assets/img/...'))+
+    '<div class="adm-sec" style="margin-top:16px">재시도 문구 (KNOCK)</div>'+
     '<p class="adm-hint">[입구에서 "재시도" 버튼을 누를 때마다 순서대로 나오는 문구입니다.]</p>'+
     D.site.knock.map(function(txt,i){
       return '<div class="adm-inline">'+
@@ -566,6 +575,7 @@ document.getElementById('btn-export').addEventListener('click',function(){
   L.push('  pairLine: '+q(s.pairLine)+',');
   L.push('  lastSync: '+q(s.lastSync)+',');
   L.push('  contact: '+q(s.contact)+',');
+  L.push('  entryImg: '+q(s.entryImg||'')+',');
   L.push('  bootIntro: '+(s.bootIntro?'true':'false')+',');
   L.push('  broadcast: '+q(s.broadcast||'')+',');
   L.push('  boot: [');

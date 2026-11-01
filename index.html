@@ -34,11 +34,13 @@
       </div>
 
       <div class="alert-body">
-        <svg class="alert-icon" width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.6" aria-hidden="true">
-          <rect x="5" y="11" width="14" height="10" rx="1"/>
-          <path id="shackle" d="M8 11V7a4 4 0 0 1 8 0v4"/>
-          <path d="M12 15v2"/>
-        </svg>
+        <div id="alert-icon-wrap">
+          <svg class="alert-icon" id="alert-icon-svg" width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.6" aria-hidden="true">
+            <rect x="5" y="11" width="14" height="10" rx="1"/>
+            <path id="shackle" d="M8 11V7a4 4 0 0 1 8 0v4"/>
+            <path d="M12 15v2"/>
+          </svg>
+        </div>
         <div class="alert-text">
           <div class="alert-lines" id="alert-lines" aria-live="polite"></div>
           <div class="checklist">
@@ -396,6 +398,16 @@
   var alertLines = document.getElementById('alert-lines');
   var timeMark = document.getElementById('time-mark');
   var shackle = document.getElementById('shackle');
+  if (SITE.entryImg) {
+    var iconWrap = document.getElementById('alert-icon-wrap');
+    var img = document.createElement('img');
+    img.src = SITE.entryImg;
+    img.alt = '';
+    img.className = 'alert-icon';
+    img.style.cssText = 'width:52px;height:52px;object-fit:contain';
+    iconWrap.innerHTML = '';
+    iconWrap.appendChild(img);
+  }
   var appEl = document.getElementById('app');
   var viewer = document.getElementById('viewer');
   var knocks = 0;
