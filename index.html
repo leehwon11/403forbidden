@@ -405,6 +405,7 @@
         d.className = 'boot-line' + (line.cls ? ' boot-line--' + line.cls : '');
         d.textContent = line.text;
         bootLines.appendChild(d);
+        sfx(line.cls === 'alert' ? 'deny' : 'boot');
       }
       i++;
       setTimeout(next, line.wait);
@@ -464,7 +465,7 @@
     function nextStep() {
       if (idx >= steps.length) {
         alertLines.innerHTML += '<div style="color:var(--green);font-weight:700">[200 OK — 접근이 허용되었습니다.]</div>';
-        sfx('open');
+        sfx('success');
         setTimeout(function () {
           setOpen(true);
           replay(document.getElementById('flash'), 'is-on');
@@ -479,7 +480,7 @@
       line.style.fontSize = '12px';
       line.textContent = step.text;
       alertLines.appendChild(line);
-      sfx('click');
+      sfx('boot');
       idx++;
       setTimeout(nextStep, step.wait);
     }
@@ -489,6 +490,7 @@
   });
 
   document.getElementById('btn-enter').addEventListener('click', function () {
+    sfx('enter');
     try { sessionStorage.setItem('entered', '1'); } catch (e) {}
     entry.hidden = true;
     appEl.hidden = false;
@@ -657,11 +659,10 @@
     page.hidden = false;
     if (!inited[name]) { initPage(name); inited[name] = true; }
     var toast = page.dataset.toast;
-    if (toast) showToast(toast);
+    if (toast) { showToast(toast); sfx('toast'); }
     window.scrollTo(0, 0);
     var win = page.querySelector('.win');
     if (win) replay(win, 'pop');
-    sfx('open');
     setTimeout(addPermBadge, 50);
     if (name === 'timeline') {
       setTimeout(function () {
@@ -767,7 +768,7 @@
             renderReader(false);
             replay(document.getElementById('lockbox'), 'shake');
             glitch(document.getElementById('lockbox'));
-            sfx('deny');
+            sfx('lock');
             document.getElementById('pw').focus();
           }
         });
@@ -842,7 +843,7 @@
           var tipEl = tip.firstChild;
           log.appendChild(tipEl);
           log.scrollTop = log.scrollHeight;
-          sfx('click');
+          sfx('type');
           var typeTime = Math.min(1200, Math.max(400, m.text.length * 40));
           replayTimer = setTimeout(function () {
             log.removeChild(tipEl);
@@ -850,7 +851,7 @@
             d.innerHTML = msgHtml(m);
             log.appendChild(d.firstChild);
             log.scrollTop = log.scrollHeight;
-            sfx('click');
+            sfx('msg');
             i++;
             replayTimer = setTimeout(step, calcDelay(msgs[i] || m));
           }, typeTime);
@@ -1096,17 +1097,60 @@
     if (!soundOn || reduce) return;
     try {
       if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      var osc = audioCtx.createOscillator();
-      var gain = audioCtx.createGain();
-      osc.connect(gain); gain.connect(audioCtx.destination);
-      gain.gain.value = 0.08;
-      if (type === 'open') { osc.frequency.value = 800; osc.type = 'square'; gain.gain.value = 0.06; }
-      else if (type === 'close') { osc.frequency.value = 400; osc.type = 'square'; gain.gain.value = 0.06; }
-      else if (type === 'click') { osc.frequency.value = 1200; osc.type = 'square'; gain.gain.value = 0.04; }
-      else if (type === 'deny') { osc.frequency.value = 200; osc.type = 'sawtooth'; gain.gain.value = 0.07; }
-      else { osc.frequency.value = 600; osc.type = 'square'; }
-      osc.start(); osc.stop(audioCtx.currentTime + 0.08);
+      var t = audioCtx.currentTime;
+
+      if (type === 'open') {
+        tone(800, 'square', 0.06, 0.06, t);
+        tone(1000, 'square', 0.04, 0.05, t + 0.07);
+      } else if (type === 'close') {
+        tone(600, 'square', 0.05, 0.06, t);
+        tone(400, 'square', 0.04, 0.06, t + 0.06);
+      } else if (type === 'click') {
+        tone(1200, 'square', 0.03, 0.04, t);
+      } else if (type === 'deny') {
+        tone(200, 'sawtooth', 0.06, 0.12, t);
+        tone(160, 'sawtooth', 0.05, 0.12, t + 0.13);
+      } else if (type === 'boot') {
+        tone(440, 'square', 0.03, 0.03, t);
+      } else if (type === 'msg') {
+        tone(880, 'sine', 0.05, 0.06, t);
+        tone(1100, 'sine', 0.04, 0.06, t + 0.08);
+        tone(880, 'sine', 0.03, 0.06, t + 0.16);
+      } else if (type === 'toast') {
+        tone(660, 'sine', 0.04, 0.08, t);
+        tone(880, 'sine', 0.03, 0.08, t + 0.1);
+      } else if (type === 'type') {
+        tone(800 + Math.random() * 400, 'square', 0.02, 0.02, t);
+      } else if (type === 'success') {
+        tone(523, 'sine', 0.05, 0.1, t);
+        tone(659, 'sine', 0.05, 0.1, t + 0.1);
+        tone(784, 'sine', 0.05, 0.15, t + 0.2);
+      } else if (type === 'lock') {
+        tone(300, 'square', 0.06, 0.06, t);
+        tone(250, 'square', 0.06, 0.06, t + 0.08);
+        tone(200, 'square', 0.07, 0.08, t + 0.16);
+      } else if (type === 'slide') {
+        tone(500, 'sine', 0.03, 0.05, t);
+        tone(700, 'sine', 0.02, 0.05, t + 0.05);
+      } else if (type === 'enter') {
+        tone(400, 'square', 0.04, 0.08, t);
+        tone(600, 'square', 0.04, 0.08, t + 0.1);
+        tone(800, 'square', 0.05, 0.12, t + 0.2);
+        tone(1200, 'sine', 0.04, 0.15, t + 0.32);
+      } else {
+        tone(600, 'square', 0.05, 0.08, t);
+      }
     } catch (e) {}
+  }
+
+  function tone(freq, wave, vol, dur, when) {
+    var osc = audioCtx.createOscillator();
+    var gain = audioCtx.createGain();
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.frequency.value = freq; osc.type = wave;
+    gain.gain.setValueAtTime(vol, when);
+    gain.gain.exponentialRampToValueAtTime(0.001, when + dur);
+    osc.start(when); osc.stop(when + dur + 0.01);
   }
 
   /* ======== 드래그 가능 창 (마우스 + 터치) ======== */
@@ -1334,6 +1378,7 @@
           history.unshift(val);
           if (history.length > 50) history.pop();
           histIdx = -1;
+          sfx('type');
           exec(val);
         }
         termInput.value = '';
