@@ -664,8 +664,8 @@ body::after {
 .notice-modal[hidden] { display: none; }
 .notice-modal .win { width: 100%; max-width: 520px; box-shadow: 8px 8px 0 var(--ink); animation: pop .3s cubic-bezier(.2, .9, .3, 1.2); }
 .notice-body { padding: 24px; font-size: 14px; line-height: 1.8; }
-.notice-body p { margin: 0 0 4px; }
-.notice-body p:last-child { margin: 0; }
+.notice-body p { margin: 8px 0 0; }
+.notice-body p:first-child { margin-top: 0; }
 .notice-foot { padding: 0 24px 20px; display: flex; justify-content: flex-end; }
 
 @media (prefers-reduced-motion: reduce) {

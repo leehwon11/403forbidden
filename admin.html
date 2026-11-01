@@ -268,7 +268,7 @@ function rSite(){
     rw('CONTACT',inp('site.contact','방명록 / 연락처 링크'))+
     rw('BOOT INTRO',chk('site.bootIntro','입구 부팅 화면 사용'))+
     '<div class="adm-sec">공지사항</div>'+
-    '<p class="adm-hint">[줄바꿈(\\n)으로 문단을 나눌 수 있어요. HTML 태그 사용 가능. 빈 문자열이면 공지 모달이 뜨지 않아요.]</p>'+
+    '<p class="adm-hint">[줄바꿈은 &lt;br&gt;로 변환됩니다. HTML 태그 사용 가능. 빈 문자열이면 공지 모달이 뜨지 않아요.]</p>'+
     rw('BROADCAST (공지사항)',area('site.broadcast','공지사항 내용을 여기에 적어요.',4))+
   '</div>';
 }

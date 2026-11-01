@@ -1496,8 +1496,7 @@
   function openNotice() {
     var text = SITE.broadcast;
     if (!text || text.indexOf('[') === 0) return;
-    document.getElementById('notice-body').innerHTML =
-      text.split('\n').map(function (line) { return '<p>' + line + '</p>'; }).join('');
+    document.getElementById('notice-body').innerHTML = text.replace(/\n/g, '<br>');
     noticeModal.hidden = false;
     replay(noticeModal.querySelector('.win'), 'pop');
     sfx('open');
