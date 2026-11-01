@@ -9,7 +9,16 @@
 <link href="https://fonts.googleapis.com/css2?family=Orbit&family=Silkscreen&family=Gowun+Batang:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/style.css">
 <style>
-.adm{padding:16px;display:flex;flex-direction:column;gap:12px}
+/* layout: fixed header/tabs/footer, scrollable middle */
+.adm-shell{display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidden}
+.adm-bar{flex:none}
+.adm-tabs-wrap{flex:none;border-bottom:2px solid var(--border);background:var(--bg)}
+.adm-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.adm-foot{flex:none;display:flex;gap:8px;padding:10px 16px;justify-content:flex-end;flex-wrap:wrap;
+  border-top:2px solid var(--border);background:var(--bg)}
+
+/* form elements */
+.adm{padding:16px;display:flex;flex-direction:column;gap:12px;max-width:780px;margin:0 auto;width:100%;box-sizing:border-box}
 .adm-row{display:flex;flex-direction:column;gap:4px}
 .adm-row>label{font-family:'Silkscreen',monospace;font-size:11px;text-transform:uppercase;color:var(--muted)}
 .adm input,.adm textarea,.adm select{
@@ -18,14 +27,23 @@
   background:var(--bg);color:var(--fg);width:100%;box-sizing:border-box}
 .adm textarea{min-height:56px;resize:vertical}
 .adm input:focus,.adm textarea:focus,.adm select:focus{outline:2px solid var(--navy);outline-offset:-2px}
-.adm-card{border:2px solid var(--border);padding:12px;margin-bottom:12px}
-.adm-card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-.adm-card-title{font-family:'Silkscreen',monospace;font-size:12px}
+
+/* cards with collapse */
+.adm-card{border:2px solid var(--border);margin-bottom:12px;background:var(--bg)}
+.adm-card-head{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;
+  background:var(--navy);color:var(--paper);cursor:pointer;user-select:none;gap:8px}
+.adm-card-head:hover{opacity:.9}
+.adm-card-title{font-family:'Silkscreen',monospace;font-size:12px;flex:1}
+.adm-card-toggle{font-family:'Silkscreen',monospace;font-size:10px;opacity:.7;flex:none}
+.adm-card-body{padding:12px}
+.adm-card.collapsed .adm-card-body{display:none}
+.adm-card.collapsed .adm-card-toggle::after{content:'OPEN'}
+.adm-card:not(.collapsed) .adm-card-toggle::after{content:'FOLD'}
+
 .adm-add{width:100%;border:2px dashed var(--muted);padding:8px;cursor:pointer;font-family:'Orbit',sans-serif;background:none;color:var(--muted)}
 .adm-add:hover{border-color:var(--fg);color:var(--fg)}
-.adm-rm{font-size:12px;cursor:pointer;background:none;border:1px solid var(--muted);padding:2px 8px;font-family:'Orbit',sans-serif;color:var(--red,#c00)}
+.adm-rm{font-size:12px;cursor:pointer;background:none;border:1px solid var(--muted);padding:2px 8px;font-family:'Orbit',sans-serif;color:var(--red,#c00);flex:none}
 .adm-rm:hover{border-color:var(--red,#c00)}
-.adm-foot{display:flex;gap:8px;padding:12px 16px;justify-content:flex-end;flex-wrap:wrap}
 .adm-sec{font-family:'Silkscreen',monospace;font-size:12px;padding:8px 0;border-bottom:1px solid var(--border);margin-bottom:8px}
 .adm-pair{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 @media(max-width:600px){.adm-pair{grid-template-columns:1fr}}
@@ -36,37 +54,51 @@
 .adm-inline{display:flex;gap:4px;margin-bottom:4px}
 .adm-inline textarea{flex:1}
 .adm-conn{font-size:12px;padding:2px 8px}
+
+/* tab badges */
+.tab-badge{font-family:'Silkscreen',monospace;font-size:9px;background:var(--navy);color:var(--paper);
+  padding:1px 5px;margin-left:4px;vertical-align:middle}
+.tab[aria-pressed="true"] .tab-badge{background:var(--paper);color:var(--navy)}
+
+/* mobile header */
+@media(max-width:600px){
+  .adm-bar-inner{flex-wrap:wrap;gap:4px}
+  .adm-bar-inner .win-title{font-size:12px;width:100%;order:-1}
+}
 </style>
 </head>
-<body>
-<main class="desk">
-  <section class="win wrap pop">
-    <div class="win-bar" style="gap:8px">
+<body style="margin:0;overflow:hidden">
+<div class="adm-shell">
+  <div class="adm-bar">
+    <div class="win-bar adm-bar-inner" style="gap:8px">
       <h1 class="win-title" style="margin:0;font-weight:400">ADMIN — /system/config</h1>
       <span class="adm-conn" id="conn"></span>
       <button type="button" class="btn btn--flat" id="btn-auth" style="font-size:12px;padding:2px 10px">로그인</button>
-      <a href="index.html">← 사이트</a>
+      <a href="index.html" style="white-space:nowrap">← 사이트</a>
     </div>
-    <div class="win-head" style="flex-wrap:wrap">
-      <div class="tabs" role="group" aria-label="섹션" id="tabs" style="flex-wrap:wrap">
-        <button type="button" class="tab" data-tab="site" aria-pressed="true">사이트</button>
-        <button type="button" class="tab" data-tab="characters" aria-pressed="false">캐릭터</button>
-        <button type="button" class="tab" data-tab="commissions" aria-pressed="false">커미션</button>
-        <button type="button" class="tab" data-tab="pairframes" aria-pressed="false">페어틀</button>
-        <button type="button" class="tab" data-tab="logs" aria-pressed="false">글 로그</button>
-        <button type="button" class="tab" data-tab="chats" aria-pressed="false">메신저</button>
-        <button type="button" class="tab" data-tab="timeline" aria-pressed="false">타임라인</button>
-        <button type="button" class="tab" data-tab="boot" aria-pressed="false">부팅/입구</button>
-      </div>
+  </div>
+  <div class="adm-tabs-wrap">
+    <div class="tabs" role="group" aria-label="섹션" id="tabs" style="flex-wrap:wrap;padding:6px 12px;gap:4px">
+      <button type="button" class="tab" data-tab="site" aria-pressed="true">사이트</button>
+      <button type="button" class="tab" data-tab="characters" aria-pressed="false">캐릭터<span class="tab-badge" id="badge-characters"></span></button>
+      <button type="button" class="tab" data-tab="commissions" aria-pressed="false">커미션<span class="tab-badge" id="badge-commissions"></span></button>
+      <button type="button" class="tab" data-tab="pairframes" aria-pressed="false">페어틀<span class="tab-badge" id="badge-pairframes"></span></button>
+      <button type="button" class="tab" data-tab="logs" aria-pressed="false">글 로그<span class="tab-badge" id="badge-logs"></span></button>
+      <button type="button" class="tab" data-tab="chats" aria-pressed="false">메신저<span class="tab-badge" id="badge-chats"></span></button>
+      <button type="button" class="tab" data-tab="timeline" aria-pressed="false">타임라인<span class="tab-badge" id="badge-timeline"></span></button>
+      <button type="button" class="tab" data-tab="boot" aria-pressed="false">부팅/입구</button>
     </div>
+  </div>
+  <div class="adm-scroll" id="adm-scroll">
     <div id="ed"></div>
-    <div class="adm-foot">
-      <span class="adm-saved" id="status"></span>
-      <button type="button" class="btn btn--dark" id="btn-save" disabled>저장</button>
-      <button type="button" class="btn" id="btn-reset">초기화</button>
-      <button type="button" class="btn" id="btn-export">data.js 내보내기</button>
-    </div>
-  </section>
+  </div>
+  <div class="adm-foot">
+    <span class="adm-saved" id="status"></span>
+    <button type="button" class="btn btn--dark" id="btn-save" disabled>저장</button>
+    <button type="button" class="btn" id="btn-reset">초기화</button>
+    <button type="button" class="btn" id="btn-export">data.js 내보내기</button>
+  </div>
+</div>
 <div id="auth-gate" style="position:fixed;inset:0;z-index:9999;background:var(--desk);display:flex;align-items:center;justify-content:center">
   <section class="win" style="width:340px;max-width:90vw">
     <div class="win-bar"><h2 class="win-title" style="margin:0;font-weight:400">ADMIN — AUTH REQUIRED</h2></div>
@@ -78,7 +110,6 @@
     </div>
   </section>
 </div>
-</main>
 
 <script src="assets/js/data.js"></script>
 <script src="assets/js/common.js"></script>
@@ -206,9 +237,21 @@ function rw(lb,html){return '<div class="adm-row"><label>'+esc(lb)+'</label>'+ht
 
 var ed=document.getElementById('ed'),curTab='site';
 
+function updateBadges(){
+  var counts={characters:D.characters.length,commissions:D.commissions.length,
+    pairframes:D.pairframes.length,logs:D.logs.length,chats:D.chats.length,timeline:D.timeline.length};
+  Object.keys(counts).forEach(function(k){
+    var el=document.getElementById('badge-'+k);
+    if(el)el.textContent=counts[k];
+  });
+}
+
 function render(){
   var fn={site:rSite,characters:rChars,commissions:rComm,pairframes:rPair,logs:rLogs,chats:rChats,timeline:rTL,boot:rBoot};
   (fn[curTab]||rSite)();
+  updateBadges();
+  var scroll=document.getElementById('adm-scroll');
+  if(scroll)scroll.scrollTop=0;
 }
 
 function rSite(){
@@ -226,8 +269,9 @@ function rSite(){
 function rChars(){
   ed.innerHTML='<div class="adm">'+D.characters.map(function(c,ci){
     var p='characters.'+ci;
-    return '<div class="adm-card">'+
-      '<div class="adm-card-head"><span class="adm-card-title">#'+(ci+1)+' '+esc(c.name)+' ('+esc(c.tag)+')</span></div>'+
+    return '<div class="adm-card collapsed">'+
+      '<div class="adm-card-head" data-action="toggle"><span class="adm-card-title">#'+(ci+1)+' '+esc(c.name)+' ('+esc(c.tag)+')</span><span class="adm-card-toggle"></span></div>'+
+      '<div class="adm-card-body">'+
       '<div class="adm-pair">'+rw('ID',inp(p+'.id','id'))+rw('이름',inp(p+'.name','이름'))+'</div>'+
       '<div class="adm-pair">'+rw('TAG',inp(p+'.tag','DREAM / ORIGINAL'))+rw('상대',inp(p+'.other','상대 이름'))+'</div>'+
       '<div class="adm-pair">'+rw('FACE (얼굴 이미지)',imgInp(p+'.face','assets/img/...'))+rw('PORTRAIT (초상 이미지)',imgInp(p+'.portrait','assets/img/...'))+'</div>'+
@@ -260,7 +304,7 @@ function rChars(){
       '<div class="adm-sec">스포일러</div>'+
       '<p class="adm-hint">[열람 확인 모달 뒤에 표시되는 내용입니다.]</p>'+
       rw('스포일러 내용',area(p+'.spoiler','스포일러 내용',5))+
-    '</div>';
+    '</div></div>';
   }).join('')+'</div>';
 }
 
@@ -285,10 +329,13 @@ function rPair(){
 function rArr(key,label,fields){
   ed.innerHTML='<div class="adm">'+D[key].map(function(item,i){
     var p=key+'.'+i;
-    return '<div class="adm-card">'+
-      '<div class="adm-card-head"><span class="adm-card-title">'+esc(label)+' #'+(i+1)+'</span>'+
-      '<button type="button" class="adm-rm" data-action="rm" data-key="'+key+'" data-i="'+i+'">삭제</button></div>'+
-      fields(p,item,i)+'</div>';
+    var summary=item.title||item.artist||item.maker||'';
+    return '<div class="adm-card collapsed">'+
+      '<div class="adm-card-head" data-action="toggle"><span class="adm-card-title">'+esc(label)+' #'+(i+1)+(summary?' — '+esc(summary):'')+'</span>'+
+      '<span class="adm-card-toggle"></span></div>'+
+      '<div class="adm-card-body">'+
+      '<div style="text-align:right;margin-bottom:8px"><button type="button" class="adm-rm" data-action="rm" data-key="'+key+'" data-i="'+i+'">삭제</button></div>'+
+      fields(p,item,i)+'</div></div>';
   }).join('')+
   '<button type="button" class="adm-add" data-action="add" data-key="'+key+'">+ '+esc(label)+' 추가</button></div>';
 }
@@ -296,9 +343,11 @@ function rArr(key,label,fields){
 function rLogs(){
   ed.innerHTML='<div class="adm">'+D.logs.map(function(item,i){
     var p='logs.'+i;
-    return '<div class="adm-card">'+
-      '<div class="adm-card-head"><span class="adm-card-title">LOG #'+(i+1)+'</span>'+
-      '<button type="button" class="adm-rm" data-action="rm" data-key="logs" data-i="'+i+'">삭제</button></div>'+
+    return '<div class="adm-card collapsed">'+
+      '<div class="adm-card-head" data-action="toggle"><span class="adm-card-title">LOG #'+(i+1)+(item.title?' — '+esc(item.title):'')+'</span>'+
+      '<span class="adm-card-toggle"></span></div>'+
+      '<div class="adm-card-body">'+
+      '<div style="text-align:right;margin-bottom:8px"><button type="button" class="adm-rm" data-action="rm" data-key="logs" data-i="'+i+'">삭제</button></div>'+
       '<div class="adm-pair">'+rw('제목',inp(p+'.title','글 제목'))+rw('날짜',inp(p+'.date','YYYY.MM.DD'))+'</div>'+
       '<div class="adm-pair">'+rw('시점',inp(p+'.pov','해인 / 도훈'))+rw('비밀번호 (빈칸=공개)',inp(p+'.password',''))+'</div>'+
       '<p class="adm-hint">[비밀번호는 연출용입니다 — 소스 보기로 노출됩니다.]</p>'+
@@ -309,7 +358,7 @@ function rLogs(){
           '<button type="button" class="adm-rm" data-action="rm-para" data-li="'+i+'" data-pi="'+pi+'" style="align-self:start">X</button></div>';
       }).join('')+
       '<button type="button" class="adm-add" data-action="add-para" data-li="'+i+'" style="margin-top:4px">+ 문단 추가</button>'+
-    '</div>';
+    '</div></div>';
   }).join('')+
   '<button type="button" class="adm-add" data-action="add" data-key="logs">+ 글 추가</button></div>';
 }
@@ -317,9 +366,11 @@ function rLogs(){
 function rChats(){
   ed.innerHTML='<div class="adm">'+D.chats.map(function(room,i){
     var p='chats.'+i;
-    return '<div class="adm-card">'+
-      '<div class="adm-card-head"><span class="adm-card-title">CHAT #'+(i+1)+'</span>'+
-      '<button type="button" class="adm-rm" data-action="rm" data-key="chats" data-i="'+i+'">삭제</button></div>'+
+    return '<div class="adm-card collapsed">'+
+      '<div class="adm-card-head" data-action="toggle"><span class="adm-card-title">CHAT #'+(i+1)+(room.title?' — '+esc(room.title):'')+'</span>'+
+      '<span class="adm-card-toggle"></span></div>'+
+      '<div class="adm-card-body">'+
+      '<div style="text-align:right;margin-bottom:8px"><button type="button" class="adm-rm" data-action="rm" data-key="chats" data-i="'+i+'">삭제</button></div>'+
       '<div class="adm-pair">'+rw('제목',inp(p+'.title','대화 백업 제목'))+rw('날짜',inp(p+'.date','YYYY.MM.DD'))+'</div>'+
       rw('상황',inp(p+'.about','상황 한 줄'))+
       '<div class="adm-sec">메시지</div>'+
@@ -332,7 +383,7 @@ function rChats(){
             '<button type="button" class="adm-rm" data-action="rm-msg" data-ci="'+i+'" data-mi="'+mi+'">X</button></div></div>';
       }).join('')+
       '<button type="button" class="adm-add" data-action="add-msg" data-ci="'+i+'" style="margin-top:4px">+ 메시지 추가</button>'+
-    '</div>';
+    '</div></div>';
   }).join('')+
   '<button type="button" class="adm-add" data-action="add" data-key="chats">+ 대화 추가</button></div>';
 }
@@ -412,6 +463,7 @@ var DEFAULTS={
 ed.addEventListener('click',function(e){
   var b=e.target.closest('[data-action]');if(!b)return;
   var a=b.dataset.action;
+  if(a==='toggle'){var card=b.closest('.adm-card');if(card)card.classList.toggle('collapsed');return;}
   if(a==='add'){D[b.dataset.key].push(JSON.parse(JSON.stringify(DEFAULTS[b.dataset.key])));persist();render();}
   if(a==='rm'){if(!confirm('#'+(+b.dataset.i+1)+' 항목을 삭제하시겠습니까?'))return;D[b.dataset.key].splice(+b.dataset.i,1);persist();render();}
   if(a==='add-row'){D.characters[+b.dataset.ci].rows.push(['','']);persist();render();}
