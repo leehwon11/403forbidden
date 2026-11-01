@@ -1497,7 +1497,7 @@
     var text = SITE.broadcast;
     if (!text || text.indexOf('[') === 0) return;
     document.getElementById('notice-body').innerHTML =
-      text.split('\n').map(function (line) { return '<p>' + esc(line) + '</p>'; }).join('');
+      text.split('\n').map(function (line) { return '<p>' + line + '</p>'; }).join('');
     noticeModal.hidden = false;
     replay(noticeModal.querySelector('.win'), 'pop');
     sfx('open');
