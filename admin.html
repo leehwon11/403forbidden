@@ -57,6 +57,11 @@ body{margin:0;overflow:hidden;background:var(--desk)}
 .adm-inline{display:flex;gap:4px;margin-bottom:4px}
 .adm-inline textarea{flex:1}
 .adm-conn{font-size:12px;padding:2px 8px;font-family:'Silkscreen',monospace}
+.adm-order{display:flex;gap:2px;flex:none}
+.adm-order button{background:none;border:1px solid rgba(255,255,255,.4);color:var(--paper);font-family:'Silkscreen',monospace;
+  font-size:10px;padding:1px 5px;cursor:pointer;line-height:1}
+.adm-order button:hover{background:rgba(255,255,255,.15)}
+.adm-order button:disabled{opacity:.3;cursor:default}
 
 /* tab badges */
 .tab-badge{font-family:'Silkscreen',monospace;font-size:9px;background:var(--bar);color:var(--paper);
@@ -242,6 +247,12 @@ function sel(p,opts){var v=gp(p);return '<select data-p="'+p+'">'+opts.map(funct
 function chk(p,lb){var v=gp(p);return '<label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" data-p="'+p+'"'+(v?' checked':'')+'>'+esc(lb)+'</label>';}
 function rw(lb,html){return '<div class="adm-row"><label>'+esc(lb)+'</label>'+html+'</div>';}
 
+function orderBtns(key,i,len){
+  return '<span class="adm-order">'+
+    '<button type="button" data-action="move-up" data-key="'+key+'" data-i="'+i+'"'+(i===0?' disabled':'')+'>&#9650;</button>'+
+    '<button type="button" data-action="move-dn" data-key="'+key+'" data-i="'+i+'"'+(i>=len-1?' disabled':'')+'>&#9660;</button></span>';
+}
+
 var ed=document.getElementById('ed'),curTab='site';
 
 function updateBadges(){
@@ -287,6 +298,8 @@ function rChars(){
         return '<div class="adm-pair" style="margin-bottom:4px">'+
           '<input data-p="'+p+'.rows.'+ri+'.0" value="'+esc(r[0])+'" placeholder="항목명">'+
           '<div style="display:flex;gap:4px"><input data-p="'+p+'.rows.'+ri+'.1" value="'+esc(r[1])+'" placeholder="값" style="flex:1">'+
+          '<button type="button" class="adm-rm" data-action="move-sub-up" data-arr="characters.'+ci+'.rows" data-i="'+ri+'"'+(ri===0?' disabled':'')+' style="font-size:10px;padding:1px 4px">&#9650;</button>'+
+          '<button type="button" class="adm-rm" data-action="move-sub-dn" data-arr="characters.'+ci+'.rows" data-i="'+ri+'"'+(ri>=c.rows.length-1?' disabled':'')+' style="font-size:10px;padding:1px 4px">&#9660;</button>'+
           '<button type="button" class="adm-rm" data-action="rm-row" data-ci="'+ci+'" data-ri="'+ri+'">X</button></div></div>';
       }).join('')+
       '<button type="button" class="adm-add" data-action="add-row" data-ci="'+ci+'" style="margin:8px 0">+ 정보 행 추가</button>'+
@@ -318,7 +331,7 @@ function rChars(){
 function rComm(){
   rArr('commissions','커미션',function(p){
     return rw('이미지 경로',imgInp(p+'.src','assets/img/commission/...'))+
-      rw('태그',sel(p+'.tag',['해인','도훈','투샷']))+
+      rw('태그',sel(p+'.tag',['LD','SD']))+
       '<div class="adm-pair">'+rw('작가명',inp(p+'.artist','작가명'))+rw('날짜',inp(p+'.date','YYYY.MM'))+'</div>'+
       rw('코멘트',inp(p+'.note','코멘트 한 줄'));
   });
@@ -327,18 +340,20 @@ function rComm(){
 function rPair(){
   rArr('pairframes','페어틀',function(p){
     return rw('이미지 경로',imgInp(p+'.src','assets/img/pairframe/...'))+
-      '<div class="adm-pair">'+rw('태그',sel(p+'.tag',['투샷','해인','도훈']))+rw('제목',inp(p+'.title','페어틀 제목'))+'</div>'+
+      '<div class="adm-pair">'+rw('태그',sel(p+'.tag',['외관','서사','기타']))+rw('제목',inp(p+'.title','페어틀 제목'))+'</div>'+
       '<div class="adm-pair">'+rw('제작자',inp(p+'.maker','제작자'))+rw('날짜',inp(p+'.date','YYYY.MM'))+'</div>'+
       rw('코멘트',inp(p+'.note','코멘트 한 줄'));
   });
 }
 
 function rArr(key,label,fields){
+  var len=D[key].length;
   ed.innerHTML='<div class="adm">'+D[key].map(function(item,i){
     var p=key+'.'+i;
     var summary=item.title||item.artist||item.maker||'';
     return '<div class="adm-card collapsed">'+
       '<div class="adm-card-head" data-action="toggle"><span class="adm-card-title">'+esc(label)+' #'+(i+1)+(summary?' — '+esc(summary):'')+'</span>'+
+      orderBtns(key,i,len)+
       '<span class="adm-card-toggle"></span></div>'+
       '<div class="adm-card-body">'+
       '<div style="text-align:right;margin-bottom:8px"><button type="button" class="adm-rm" data-action="rm" data-key="'+key+'" data-i="'+i+'">삭제</button></div>'+
@@ -348,10 +363,12 @@ function rArr(key,label,fields){
 }
 
 function rLogs(){
+  var len=D.logs.length;
   ed.innerHTML='<div class="adm">'+D.logs.map(function(item,i){
     var p='logs.'+i;
     return '<div class="adm-card collapsed">'+
       '<div class="adm-card-head" data-action="toggle"><span class="adm-card-title">LOG #'+(i+1)+(item.title?' — '+esc(item.title):'')+'</span>'+
+      orderBtns('logs',i,len)+
       '<span class="adm-card-toggle"></span></div>'+
       '<div class="adm-card-body">'+
       '<div style="text-align:right;margin-bottom:8px"><button type="button" class="adm-rm" data-action="rm" data-key="logs" data-i="'+i+'">삭제</button></div>'+
@@ -359,9 +376,11 @@ function rLogs(){
       '<div class="adm-pair">'+rw('시점',inp(p+'.pov','해인 / 도훈'))+rw('비밀번호 (빈칸=공개)',inp(p+'.password',''))+'</div>'+
       '<p class="adm-hint">[비밀번호는 연출용입니다 — 소스 보기로 노출됩니다.]</p>'+
       '<div class="adm-sec">본문 문단</div>'+
-      item.body.map(function(para,pi){
+      item.body.map(function(para,pi){var blen=item.body.length;
         return '<div class="adm-inline">'+
           '<textarea data-p="'+p+'.body.'+pi+'" rows="2" placeholder="문단 '+(pi+1)+'">'+esc(para)+'</textarea>'+
+          '<button type="button" class="adm-rm" data-action="move-sub-up" data-arr="logs.'+i+'.body" data-i="'+pi+'"'+(pi===0?' disabled':'')+' style="font-size:10px;padding:1px 4px;align-self:start">&#9650;</button>'+
+          '<button type="button" class="adm-rm" data-action="move-sub-dn" data-arr="logs.'+i+'.body" data-i="'+pi+'"'+(pi>=blen-1?' disabled':'')+' style="font-size:10px;padding:1px 4px;align-self:start">&#9660;</button>'+
           '<button type="button" class="adm-rm" data-action="rm-para" data-li="'+i+'" data-pi="'+pi+'" style="align-self:start">X</button></div>';
       }).join('')+
       '<button type="button" class="adm-add" data-action="add-para" data-li="'+i+'" style="margin-top:4px">+ 문단 추가</button>'+
@@ -371,22 +390,26 @@ function rLogs(){
 }
 
 function rChats(){
+  var len=D.messages.length;
   ed.innerHTML='<div class="adm">'+D.messages.map(function(room,i){
     var p='messages.'+i;
     return '<div class="adm-card collapsed">'+
       '<div class="adm-card-head" data-action="toggle"><span class="adm-card-title">MSG #'+(i+1)+(room.title?' — '+esc(room.title):'')+'</span>'+
+      orderBtns('messages',i,len)+
       '<span class="adm-card-toggle"></span></div>'+
       '<div class="adm-card-body">'+
       '<div style="text-align:right;margin-bottom:8px"><button type="button" class="adm-rm" data-action="rm" data-key="messages" data-i="'+i+'">삭제</button></div>'+
       '<div class="adm-pair">'+rw('제목',inp(p+'.title','대화 백업 제목'))+rw('날짜',inp(p+'.date','YYYY.MM.DD'))+'</div>'+
       rw('상황',inp(p+'.about','상황 한 줄'))+
       '<div class="adm-sec">메시지</div>'+
-      room.messages.map(function(m,mi){
+      room.messages.map(function(m,mi){var mlen=room.messages.length;
         return '<div class="adm-msg">'+
           sel(p+'.messages.'+mi+'.from',[['haein','해인'],['dohun','도훈'],['system','시스템'],['error','오류']])+
           '<input data-p="'+p+'.messages.'+mi+'.text" value="'+esc(m.text)+'" placeholder="메시지 내용">'+
           '<div style="display:flex;gap:2px">'+
             '<input data-p="'+p+'.messages.'+mi+'.time" value="'+esc(m.time||'')+'" placeholder="00:00" style="width:50px">'+
+            '<button type="button" class="adm-rm" data-action="move-sub-up" data-arr="messages.'+i+'.messages" data-i="'+mi+'"'+(mi===0?' disabled':'')+' style="font-size:10px;padding:1px 4px">&#9650;</button>'+
+            '<button type="button" class="adm-rm" data-action="move-sub-dn" data-arr="messages.'+i+'.messages" data-i="'+mi+'"'+(mi>=mlen-1?' disabled':'')+' style="font-size:10px;padding:1px 4px">&#9660;</button>'+
             '<button type="button" class="adm-rm" data-action="rm-msg" data-ci="'+i+'" data-mi="'+mi+'">X</button></div></div>';
       }).join('')+
       '<button type="button" class="adm-add" data-action="add-msg" data-ci="'+i+'" style="margin-top:4px">+ 메시지 추가</button>'+
@@ -409,9 +432,11 @@ function rBoot(){
     '<div class="adm-sec">부팅 시퀀스</div>'+
     '<p class="adm-hint">[부팅 화면에 순서대로 나오는 줄입니다. cls: dim(흐리게) / alert(빨강) / 빈칸(기본)]</p>'+
     D.site.boot.map(function(line,i){
-      var p='site.boot.'+i;
+      var p='site.boot.'+i;var blen=D.site.boot.length;
       return '<div class="adm-card" style="padding:8px">'+
         '<div class="adm-card-head"><span class="adm-card-title">줄 #'+(i+1)+'</span>'+
+        '<button type="button" class="adm-rm" data-action="move-sub-up" data-arr="site.boot" data-i="'+i+'"'+(i===0?' disabled':'')+' style="font-size:10px;padding:1px 4px;color:var(--paper)">&#9650;</button>'+
+        '<button type="button" class="adm-rm" data-action="move-sub-dn" data-arr="site.boot" data-i="'+i+'"'+(i>=blen-1?' disabled':'')+' style="font-size:10px;padding:1px 4px;color:var(--paper)">&#9660;</button>'+
         '<button type="button" class="adm-rm" data-action="rm-boot" data-i="'+i+'">X</button></div>'+
         '<div class="adm-pair">'+
           rw('TEXT',inp(p+'.text','화면에 뜨는 문장 (빈칸=빈 줄)'))+
@@ -431,18 +456,22 @@ function rEntry(){
     rw('ENTRY IMAGE',imgInp('site.entryImg','assets/img/...'))+
     '<div class="adm-sec" style="margin-top:16px">재시도 문구 (KNOCK)</div>'+
     '<p class="adm-hint">[입구에서 "재시도" 버튼을 누를 때마다 순서대로 나오는 문구입니다.]</p>'+
-    D.site.knock.map(function(txt,i){
+    D.site.knock.map(function(txt,i){var klen=D.site.knock.length;
       return '<div class="adm-inline">'+
         '<input data-p="site.knock.'+i+'" value="'+esc(txt)+'" placeholder="재시도 문구 '+(i+1)+'">'+
+        '<button type="button" class="adm-rm" data-action="move-sub-up" data-arr="site.knock" data-i="'+i+'"'+(i===0?' disabled':'')+' style="font-size:10px;padding:1px 4px">&#9650;</button>'+
+        '<button type="button" class="adm-rm" data-action="move-sub-dn" data-arr="site.knock" data-i="'+i+'"'+(i>=klen-1?' disabled':'')+' style="font-size:10px;padding:1px 4px">&#9660;</button>'+
         '<button type="button" class="adm-rm" data-action="rm-knock" data-i="'+i+'" style="align-self:start">X</button></div>';
     }).join('')+
     '<button type="button" class="adm-add" data-action="add-knock">+ 재시도 문구 추가</button>'+
     '<div class="adm-sec" style="margin-top:16px">기다리기 연출 단계 (WAIT STEPS)</div>'+
     '<p class="adm-hint">[기다리기 버튼을 누르면 순서대로 나오는 시스템 처리 문구입니다.]</p>'+
     (D.site.waitSteps||[]).map(function(step,i){
-      var p='site.waitSteps.'+i;
+      var p='site.waitSteps.'+i;var wlen=(D.site.waitSteps||[]).length;
       return '<div class="adm-card" style="padding:8px">'+
         '<div class="adm-card-head"><span class="adm-card-title">단계 #'+(i+1)+'</span>'+
+        '<button type="button" class="adm-rm" data-action="move-sub-up" data-arr="site.waitSteps" data-i="'+i+'"'+(i===0?' disabled':'')+' style="font-size:10px;padding:1px 4px;color:var(--paper)">&#9650;</button>'+
+        '<button type="button" class="adm-rm" data-action="move-sub-dn" data-arr="site.waitSteps" data-i="'+i+'"'+(i>=wlen-1?' disabled':'')+' style="font-size:10px;padding:1px 4px;color:var(--paper)">&#9660;</button>'+
         '<button type="button" class="adm-rm" data-action="rm-wait" data-i="'+i+'">X</button></div>'+
         '<div class="adm-pair">'+
           rw('TEXT',inp(p+'.text','시스템 처리 문구'))+
@@ -476,6 +505,8 @@ function rTerm(){
         '<input data-p="'+p+'.text" value="'+esc(line.text||'')+'" placeholder="응답 문구">'+
         '<div style="display:flex;gap:4px">'+
         sel(p+'.cls',[['','기본'],['dim','dim'],['alert','alert'],['info','info']])+
+        '<button type="button" class="adm-rm" data-action="move-sub-up" data-arr="terminal.'+g.key+'" data-i="'+i+'"'+(i===0?' disabled':'')+' style="font-size:10px;padding:1px 4px">&#9650;</button>'+
+        '<button type="button" class="adm-rm" data-action="move-sub-dn" data-arr="terminal.'+g.key+'" data-i="'+i+'"'+(i>=arr.length-1?' disabled':'')+' style="font-size:10px;padding:1px 4px">&#9660;</button>'+
         '<button type="button" class="adm-rm" data-action="rm-term" data-key="'+g.key+'" data-i="'+i+'">X</button>'+
         '</div></div>';
     });
@@ -499,8 +530,8 @@ ed.addEventListener('change',function(e){
 });
 
 var DEFAULTS={
-  commissions:{src:'',tag:'투샷',artist:'',date:'',note:''},
-  pairframes:{src:'',tag:'투샷',title:'',maker:'',date:'',note:''},
+  commissions:{src:'',tag:'LD',artist:'',date:'',note:''},
+  pairframes:{src:'',tag:'외관',title:'',maker:'',date:'',note:''},
   logs:{title:'',date:'',pov:'',password:'',body:['']},
   messages:{title:'',date:'',about:'',messages:[{from:'system',text:'',time:''}]},
   records:{date:'',code:'',type:'',title:'',desc:''}
@@ -510,6 +541,16 @@ ed.addEventListener('click',function(e){
   var b=e.target.closest('[data-action]');if(!b)return;
   var a=b.dataset.action;
   if(a==='toggle'){var card=b.closest('.adm-card');if(card)card.classList.toggle('collapsed');return;}
+  if(a==='move-up'||a==='move-dn'){
+    var mk=b.dataset.key,mi=+b.dataset.i,mj=a==='move-up'?mi-1:mi+1;
+    if(mj<0||mj>=D[mk].length)return;
+    var tmp=D[mk][mi];D[mk][mi]=D[mk][mj];D[mk][mj]=tmp;persist();render();return;
+  }
+  if(a==='move-sub-up'||a==='move-sub-dn'){
+    var arr=gp(b.dataset.arr),si=+b.dataset.i,sj=a==='move-sub-up'?si-1:si+1;
+    if(sj<0||sj>=arr.length)return;
+    var st=arr[si];arr[si]=arr[sj];arr[sj]=st;persist();render();return;
+  }
   if(a==='add'){D[b.dataset.key].push(JSON.parse(JSON.stringify(DEFAULTS[b.dataset.key])));persist();render();}
   if(a==='rm'){if(!confirm('#'+(+b.dataset.i+1)+' 항목을 삭제하시겠습니까?'))return;D[b.dataset.key].splice(+b.dataset.i,1);persist();render();}
   if(a==='add-row'){D.characters[+b.dataset.ci].rows.push(['','']);persist();render();}

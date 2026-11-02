@@ -115,22 +115,23 @@ const CHARACTERS = [
 ];
 
 /* ---------- 이미지 백업: 커미션 ----------
-   tag 는 '해인' / '도훈' / '투샷' 중 하나 (필터 버튼과 같은 글자) */
+   tag 는 'LD' / 'SD' 중 하나 (필터 버튼과 같은 글자) */
 const COMMISSIONS = [
-  { src: '', tag: '해인', artist: '[작가명]', date: '[YYYY.MM]', note: '[코멘트 한 줄]' },
-  { src: '', tag: '도훈', artist: '[작가명]', date: '[YYYY.MM]', note: '[코멘트 한 줄]' },
-  { src: '', tag: '투샷', artist: '[작가명]', date: '[YYYY.MM]', note: '[코멘트 한 줄]' },
-  { src: '', tag: '투샷', artist: '[작가명]', date: '[YYYY.MM]', note: '[코멘트 한 줄]' },
-  { src: '', tag: '해인', artist: '[작가명]', date: '[YYYY.MM]', note: '[코멘트 한 줄]' },
-  { src: '', tag: '도훈', artist: '[작가명]', date: '[YYYY.MM]', note: '[코멘트 한 줄]' }
+  { src: '', tag: 'LD', artist: '[작가명]', date: '[YYYY.MM]', note: '[코멘트 한 줄]' },
+  { src: '', tag: 'SD', artist: '[작가명]', date: '[YYYY.MM]', note: '[코멘트 한 줄]' },
+  { src: '', tag: 'LD', artist: '[작가명]', date: '[YYYY.MM]', note: '[코멘트 한 줄]' },
+  { src: '', tag: 'SD', artist: '[작가명]', date: '[YYYY.MM]', note: '[코멘트 한 줄]' },
+  { src: '', tag: 'LD', artist: '[작가명]', date: '[YYYY.MM]', note: '[코멘트 한 줄]' },
+  { src: '', tag: 'SD', artist: '[작가명]', date: '[YYYY.MM]', note: '[코멘트 한 줄]' }
 ];
 
-/* ---------- 이미지 백업: 페어틀 (가로형) ---------- */
+/* ---------- 이미지 백업: 페어틀 (가로형) ----------
+   tag 는 '외관' / '서사' / '기타' 중 하나 (필터 버튼과 같은 글자) */
 const PAIRFRAMES = [
-  { src: '', tag: '투샷', title: '[페어틀 제목]', maker: '[제작자]', date: '[YYYY.MM]', note: '[코멘트 한 줄]' },
-  { src: '', tag: '해인', title: '[페어틀 제목]', maker: '[제작자]', date: '[YYYY.MM]', note: '[코멘트 한 줄]' },
-  { src: '', tag: '도훈', title: '[페어틀 제목]', maker: '[제작자]', date: '[YYYY.MM]', note: '[코멘트 한 줄]' },
-  { src: '', tag: '투샷', title: '[페어틀 제목]', maker: '[제작자]', date: '[YYYY.MM]', note: '[코멘트 한 줄]' }
+  { src: '', tag: '외관', title: '[페어틀 제목]', maker: '[제작자]', date: '[YYYY.MM]', note: '[코멘트 한 줄]' },
+  { src: '', tag: '서사', title: '[페어틀 제목]', maker: '[제작자]', date: '[YYYY.MM]', note: '[코멘트 한 줄]' },
+  { src: '', tag: '기타', title: '[페어틀 제목]', maker: '[제작자]', date: '[YYYY.MM]', note: '[코멘트 한 줄]' },
+  { src: '', tag: '외관', title: '[페어틀 제목]', maker: '[제작자]', date: '[YYYY.MM]', note: '[코멘트 한 줄]' }
 ];
 
 /* ---------- 로그 ----------
