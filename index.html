@@ -87,11 +87,11 @@
           <nav class="apps" aria-label="메뉴">
             <a class="app" href="#commission">
               <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5" aria-hidden="true"><path d="M4 5h16v14H4z M4 15l5-5 4 4 3-3 4 4"/><circle cx="15" cy="9.5" r="1"/></svg>
-              <span>커미션</span><small>COMMISSION.IMG/</small>
+              <span>커미션</span><small>COMMISSION.IMG</small>
             </a>
             <a class="app" href="#pairframe">
               <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5" aria-hidden="true"><path d="M3 5h8v14H3z M13 5h8v14h-8z"/></svg>
-              <span>페어틀</span><small>PAIRFRAME.IMG/</small>
+              <span>페어틀</span><small>PAIRFRAME.IMG</small>
             </a>
             <a class="app" href="#log">
               <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5" aria-hidden="true"><path d="M6 3h9l4 4v14H6z M15 3v4h4 M9 12h7 M9 16h7"/></svg>
@@ -103,7 +103,7 @@
             </a>
             <a class="app" href="#character">
               <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/></svg>
-              <span>캐릭터</span><small>CHARACTER.WIKI/</small>
+              <span>캐릭터</span><small>CHARACTER.WIKI</small>
             </a>
             <a class="app" href="#record">
               <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5" aria-hidden="true"><path d="M12 3v18 M12 7h6 M12 12H6 M12 17h6"/></svg>
@@ -282,8 +282,8 @@
       <span class="win-box" aria-hidden="true"></span>
     </div>
     <div style="padding:20px;text-align:center">
-      <p style="margin:0 0 8px">[이 섹션에는 원작 스포일러가 포함되어 있습니다.]</p>
-      <p style="margin:0 0 16px;color:var(--muted)">[열람을 원하시면 아래 버튼을 눌러 주세요.]</p>
+      <p style="margin:0 0 8px">[원작 스포일러가 포함되어 있습니다.]</p>
+      <p style="margin:0 0 16px;color:var(--muted)">주의하시기를 바랍니다.</p>
       <div style="display:flex;gap:8px;justify-content:center">
         <button type="button" class="btn btn--dark" id="spoiler-ok">열람하기</button>
         <button type="button" class="btn" id="spoiler-cancel">닫기</button>
@@ -461,7 +461,7 @@
       ['‘현자’와 ‘모래’ 모두 확인되었습니다.', '']
     ];
     var rows = open
-      ? [["‘us’가 충족되었습니다.", ''], ["200 OK — Akasha의 접근을 허용합니다.", 'is-ok']]
+      ? [["‘us’가 충족되었습니다.", ''], ["200 OK — Akasha 접근을 허용합니다.", 'is-ok']]
       : base.concat([[KNOCK[Math.min(knocks, KNOCK.length - 1)], 'is-red']]);
     alertLines.innerHTML = rows.map(function (r) { return '<div class="' + r[1] + '">[' + esc(r[0]) + ']</div>'; }).join('');
   }
@@ -494,7 +494,7 @@
     var steps = SITE.waitSteps && SITE.waitSteps.length ? SITE.waitSteps : [
       { text: '[조건을 재검토합니다...]', wait: 600 },
       { text: '[102 PROCESSING]', wait: 700 },
-      { text: '[조건이 충족되었습니다: 때]', wait: 600 }
+      { text: '[조건이 충족되었습니다: ‘us’', wait: 600 }
     ];
 
     var idx = 0;
@@ -831,8 +831,8 @@
           '<div class="lockwrap"><div class="win lockbox" id="lockbox">' +
           '<div class="win-bar win-bar--deny"><span class="win-title" style="font-size:13px">ACCESS DENIED — 403</span></div>' +
           '<form class="lockbox-body" id="lockform">' +
-          "<div>['" + esc(p.title) + "' 은(는) 잠긴 로그입니다.]<br>[열람하려면 비밀번호가 필요합니다.]</div>" +
-          '<label for="pw">비밀번호 · [힌트 자리]</label>' +
+          "<div>[보안이 설정된 로그입니다.]<br>[열람 비밀번호를 입력하세요.]</div>" +
+          '<label for="pw">비밀번호</label>' +
           '<input id="pw" type="password" autocomplete="off">' +
           (wrong ? '<div class="lockbox-error" role="alert">[비밀번호 불일치 — 접근이 거부되었습니다.]</div>' : '') +
           '<button type="submit" class="btn btn--dark btn--flat">요청 보내기</button>' +
@@ -854,8 +854,8 @@
         return;
       }
       var status = p.password
-        ? '<div class="reader-status is-ok">[200 OK — 잠긴 로그 ' + no(sel) + ' 이(가) 열렸습니다.]</div>'
-        : '<div class="reader-status">[LOG ' + no(sel) + ' 을(를) 불러왔습니다.]</div>';
+        ? '<div class="reader-status is-ok">[200 OK — 로그가 열렸습니다.]</div>'
+        : '<div class="reader-status">[로그를 불러왔습니다.]</div>';
       reader.innerHTML = status +
         '<h1>' + esc(p.title) + '</h1>' +
         '<div class="reader-meta">' + esc(p.date) + ' · 시점 ' + esc(p.pov) + '</div>' +
@@ -1071,7 +1071,7 @@
           '<section class="panel"><h2>[싫어하는 것]</h2>' + listHtml(c.dislikes) + '</section>' +
         '</div>' +
         '<section class="panel" style="border:2px solid var(--red);position:relative">' +
-          '<h2 style="color:var(--red)">[스포일러 구역]</h2>' +
+          '<h2 style="color:var(--red)">[스포일러]</h2>' +
           (spoilerRevealed[cur]
             ? '<div class="panel--sheet" style="padding:12px"><p>' + escBr(c.spoiler || '') + '</p></div>'
             : '<div style="padding:12px;text-align:center;color:var(--muted)">[이 구역의 내용은 숨겨져 있습니다.]<br>' +
@@ -1426,7 +1426,7 @@
       },
       whoami: function () {
         termLine('[접속자 정보 조회]', 'info');
-        termLine('  권한: VISITOR (읽기 전용)', '');
+        termLine('  권한: VISITOR', '');
         termLine('  등급: 미등록', '');
         termLine('  [관리자 권한이 필요한 작업은 수행할 수 없습니다.]', 'dim');
       },
