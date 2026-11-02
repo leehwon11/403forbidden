@@ -1038,7 +1038,7 @@
         return '<button type="button" class="tab" data-i="' + i + '" aria-pressed="' + (i === cur) + '">' + esc(x.name) + '</button>';
       }).join('');
       var c = CHARACTERS[cur];
-      wiki.innerHTML =
+      character.innerHTML =
         "<div class=\"wiki-loaded\">['" + esc(c.name) + "' 의 등록 정보를 불러왔습니다.]</div>" +
         '<div class="wiki-top">' +
           '<div class="portrait">' + media(c.portrait, 'PORTRAIT', c.name) + '</div>' +
@@ -1072,7 +1072,7 @@
       replay(character, 'pop');
     }
 
-    wiki.addEventListener('click', function (e) {
+    character.addEventListener('click', function (e) {
       var ch = e.target.closest('.collapse-head');
       if (ch) {
         var open = ch.classList.toggle('is-open');
