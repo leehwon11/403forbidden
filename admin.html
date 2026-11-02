@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ADMIN — 403 Forbidden</title>
+<title>ADMIN — 403 FORBIDDEN</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Orbit&family=Silkscreen&family=Gowun+Batang:wght@400;700&display=swap" rel="stylesheet">
@@ -87,9 +87,9 @@ body{margin:0;overflow:hidden;background:var(--desk)}
       <button type="button" class="tab" data-tab="characters" aria-pressed="false">캐릭터<span class="tab-badge" id="badge-characters"></span></button>
       <button type="button" class="tab" data-tab="commissions" aria-pressed="false">커미션<span class="tab-badge" id="badge-commissions"></span></button>
       <button type="button" class="tab" data-tab="pairframes" aria-pressed="false">페어틀<span class="tab-badge" id="badge-pairframes"></span></button>
-      <button type="button" class="tab" data-tab="logs" aria-pressed="false">글 로그<span class="tab-badge" id="badge-logs"></span></button>
+      <button type="button" class="tab" data-tab="logs" aria-pressed="false">로그<span class="tab-badge" id="badge-logs"></span></button>
       <button type="button" class="tab" data-tab="messages" aria-pressed="false">메시지<span class="tab-badge" id="badge-messages"></span></button>
-      <button type="button" class="tab" data-tab="records" aria-pressed="false">타임라인<span class="tab-badge" id="badge-records"></span></button>
+      <button type="button" class="tab" data-tab="records" aria-pressed="false">기록<span class="tab-badge" id="badge-records"></span></button>
       <button type="button" class="tab" data-tab="boot" aria-pressed="false">부팅</button>
       <button type="button" class="tab" data-tab="entry" aria-pressed="false">입구</button>
       <button type="button" class="tab" data-tab="terminal" aria-pressed="false">터미널</button>
@@ -374,7 +374,7 @@ function rChats(){
   ed.innerHTML='<div class="adm">'+D.messages.map(function(room,i){
     var p='messages.'+i;
     return '<div class="adm-card collapsed">'+
-      '<div class="adm-card-head" data-action="toggle"><span class="adm-card-title">CHAT #'+(i+1)+(room.title?' — '+esc(room.title):'')+'</span>'+
+      '<div class="adm-card-head" data-action="toggle"><span class="adm-card-title">MSG #'+(i+1)+(room.title?' — '+esc(room.title):'')+'</span>'+
       '<span class="adm-card-toggle"></span></div>'+
       '<div class="adm-card-body">'+
       '<div style="text-align:right;margin-bottom:8px"><button type="button" class="adm-rm" data-action="rm" data-key="messages" data-i="'+i+'">삭제</button></div>'+
@@ -396,7 +396,7 @@ function rChats(){
 }
 
 function rTL(){
-  rArr('records','타임라인',function(p){
+  rArr('records','기록',function(p){
     return '<div class="adm-pair">'+rw('날짜',inp(p+'.date','YYYY.MM'))+rw('상태 코드',inp(p+'.code','403 FORBIDDEN'))+'</div>'+
       '<div class="adm-pair">'+rw('타입',sel(p+'.type',[['','기본 (흰색)'],['deny','거절 (빨강)'],['ok','열림 (초록)']]))+rw('제목',inp(p+'.title','사건 제목'))+'</div>'+
       rw('설명',inp(p+'.desc','사건 설명'));
@@ -632,7 +632,7 @@ document.getElementById('btn-export').addEventListener('click',function(){
   });
   L.push('];');
   L.push('');
-  L.push("/* ---------- 글 로그 ---------- */");
+  L.push("/* ---------- 로그 ---------- */");
   L.push('const LOGS = [');
   D.logs.forEach(function(l,i){
     L.push("  { title: "+q(l.title)+", date: "+q(l.date)+", pov: "+q(l.pov)+", password: "+q(l.password)+",");
@@ -640,7 +640,7 @@ document.getElementById('btn-export').addEventListener('click',function(){
   });
   L.push('];');
   L.push('');
-  L.push("/* ---------- 메신저 ---------- */");
+  L.push("/* ---------- 메시지 ---------- */");
   L.push('const CHATS = [');
   D.messages.forEach(function(r,ri){
     L.push('  {');
@@ -657,7 +657,7 @@ document.getElementById('btn-export').addEventListener('click',function(){
   });
   L.push('];');
   L.push('');
-  L.push("/* ---------- 타임라인 ---------- */");
+  L.push("/* ---------- 기록 ---------- */");
   L.push('const TIMELINE = [');
   D.records.forEach(function(t,i){
     L.push("  { date: "+q(t.date)+", code: "+q(t.code)+", type: "+q(t.type)+", title: "+q(t.title)+", desc: "+q(t.desc)+" }"+(i<D.records.length-1?',':''));

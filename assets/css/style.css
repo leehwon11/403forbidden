@@ -585,7 +585,7 @@ a, button, [role="button"], label, select, summary { cursor: pointer; }
 }
 .explorer-list { padding: 8px 0; }
 .explorer-row {
-  display: grid; grid-template-columns: 24px 1fr 100px 80px 60px;
+  display: grid; grid-template-columns: 24px 3fr 1fr 90px 70px;
   gap: 8px; align-items: center; padding: 4px 14px;
   font-size: 13px; cursor: pointer; border: none; background: none;
   width: 100%; text-align: left; color: var(--ink);
@@ -602,14 +602,14 @@ a, button, [role="button"], label, select, summary { cursor: pointer; }
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .explorer-head {
-  display: grid; grid-template-columns: 24px 1fr 100px 80px 60px;
+  display: grid; grid-template-columns: 24px 3fr 1fr 90px 70px;
   gap: 8px; padding: 4px 14px; border-bottom: 1px solid var(--ink);
   font-family: var(--pixel); font-size: 10px; color: var(--muted);
 }
 
 /* ---------- 글 로그 / 메시지 익스플로러 ---------- */
-.explorer-row--log, .explorer-head--log { grid-template-columns: 24px 1fr 80px 50px; }
-.explorer-row--msg, .explorer-head--msg { grid-template-columns: 24px 1fr 80px 1fr; }
+.explorer-row--log, .explorer-head--log { grid-template-columns: 24px 3fr 1fr 70px; }
+.explorer-row--msg, .explorer-head--msg { grid-template-columns: 24px 3fr 1fr 1fr; }
 .explorer-sub { font-size: 11px; color: var(--muted); margin-left: 6px; }
 
 /* ---------- 텍스트 선택 색상 ---------- */
