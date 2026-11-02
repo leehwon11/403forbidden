@@ -120,7 +120,7 @@
   </div>
 
   <!-- 커미션 -->
-  <div id="page-commission" class="page" hidden data-toast="> cd/Akasha/commission">
+  <div id="page-commission" class="page" hidden data-toast="[> cd/Akasha/commission]">
     <section class="win wrap pop">
       <div class="win-bar">
         <h1 class="win-title" style="margin:0;font-weight:400">COMMISSION.IMG</h1>
@@ -144,7 +144,7 @@
   <div id="page-pairframe" class="page" hidden data-toast="[> cd/Akasha/pairframe]">
     <section class="win wrap pop">
       <div class="win-bar">
-        <h1 class="win-title" style="margin:0;font-weight:400">PAIRFRAME.IMG/h1>
+        <h1 class="win-title" style="margin:0;font-weight:400">PAIRFRAME.IMG</h1>
         <a href="#home">← 메뉴</a>
       </div>
       <div class="win-head">
@@ -228,10 +228,10 @@
   </div>
 
   <!-- 레코드 -->
-  <div id="page-record" class="page" hidden data-toast="[> cd/Akasha/character]">
+  <div id="page-record" class="page" hidden data-toast="[> cd/Akasha/record]">
     <section class="win wrap wrap--narrow pop">
       <div class="win-bar">
-        <h1 class="win-title" style="margin:0;font-weight:400">record — /us/access.log</h1>
+        <h1 class="win-title" style="margin:0;font-weight:400">RECORD.SYS</h1>
         <a href="#home">← 메뉴</a>
       </div>
       <div class="win-head">[Akasha에 저장된 기록을 불러오는 중···]</div>
@@ -316,7 +316,7 @@
 <div class="terminal-wrap" id="terminal" hidden>
   <div class="terminal">
     <div class="win-bar">
-      <span class="win-title" style="font-size:11px;color:#33ff33;background:transparent">SYSTEM TERMINAL — /us/</span>
+      <span class="win-title" style="font-size:11px;color:#33ff33;background:transparent">SYSTEM TERMINAL — /Akasha/</span>
       <button type="button" class="viewer-close" id="term-close" aria-label="닫기" style="color:#33ff33">X</button>
     </div>
     <div class="terminal-body" id="term-body"></div>
@@ -623,7 +623,7 @@
         explList.hidden = false;
         viewBtn.textContent = 'GALLERY';
         viewBtn.classList.add('is-active');
-        var path = 'C:\\SYSTEM\\us\\' + dirName + '\\';
+        var path = 'C:\\SYSTEM\\Akasha\\' + dirName + '\\';
         explList.innerHTML =
           '<div class="explorer-bar"><span>PATH:</span><span class="explorer-path">' + esc(path) + '</span></div>' +
           '<div class="explorer-head"><span></span><span>NAME</span><span>ARTIST</span><span>DATE</span><span>TAG</span></div>' +
@@ -777,7 +777,7 @@
 
     function renderExplorer() {
       explorer.innerHTML =
-        '<div class="explorer-bar"><span>PATH:</span><span class="explorer-path">C:\\SYSTEM\\us\\log\\</span></div>' +
+        '<div class="explorer-bar"><span>PATH:</span><span class="explorer-path">C:\\SYSTEM\\Akasha\\log\\</span></div>' +
         '<div class="explorer-head explorer-head--log"><span></span><span>NAME</span><span>DATE</span><span>STATUS</span></div>' +
         LOGS.map(function (p, i) {
           var st = p.password ? (unlocked[i] ? '200' : '403') : '';
@@ -801,7 +801,7 @@
       explorer.hidden = true;
       backbar.hidden = false;
       split.hidden = false;
-      curPath.textContent = 'C:\\SYSTEM\\us\\log\\LOG_' + no(sel) + '.txt';
+      curPath.textContent = 'C:\\SYSTEM\\Akasha\\log\\LOG_' + no(sel) + '.txt';
       renderList(); renderReader(true);
     }
 
@@ -821,7 +821,7 @@
 
     function renderReader(justOpened) {
       var p = LOGS[sel];
-      curPath.textContent = 'C:\\SYSTEM\\us\\log\\LOG_' + no(sel) + '.txt';
+      curPath.textContent = 'C:\\SYSTEM\\Akasha\\log\\LOG_' + no(sel) + '.txt';
       if (isLocked(sel)) {
         reader.innerHTML =
           '<div class="lockwrap"><div class="win lockbox" id="lockbox">' +
@@ -899,7 +899,7 @@
 
     function renderExplorer() {
       explorer.innerHTML =
-        '<div class="explorer-bar"><span>PATH:</span><span class="explorer-path">C:\\SYSTEM\\us\\message\\</span></div>' +
+        '<div class="explorer-bar"><span>PATH:</span><span class="explorer-path">C:\\SYSTEM\\Akasha\\message\\</span></div>' +
         '<div class="explorer-head explorer-head--msg"><span></span><span>NAME</span><span>DATE</span><span>NOTE</span></div>' +
         CHATS.map(function (r, i) {
           return '<button type="button" class="explorer-row explorer-row--msg" data-i="' + i + '">' +
@@ -923,7 +923,7 @@
       explorer.hidden = true;
       backbar.hidden = false;
       split.hidden = false;
-      curPath.textContent = 'C:\\SYSTEM\\us\\message\\MSG_' + no(sel) + '.bak';
+      curPath.textContent = 'C:\\SYSTEM\\Akasha\\message\\MSG_' + no(sel) + '.bak';
       headTitle.textContent = CHATS[sel].title;
       renderRooms();
       replayChat();
@@ -1008,7 +1008,7 @@
       if (b) {
         sel = Number(b.dataset.i);
         headTitle.textContent = CHATS[sel].title;
-        curPath.textContent = 'C:\\SYSTEM\\us\\message\\MSG_' + no(sel) + '.bak';
+        curPath.textContent = 'C:\\SYSTEM\\Akasha\\message\\MSG_' + no(sel) + '.bak';
         renderRooms();
         replayChat();
       }
@@ -1386,13 +1386,13 @@
       },
       status: function () {
         termLine('[SYSTEM STATUS REPORT]', 'info');
-        termLine('  SYSTEM       PLANET.EARTH v0.403', '');
-        termLine('  REGISTERED   ' + CHARACTERS.length + ' character(s)', '');
-        termLine('  LOGS         ' + LOGS.length + ' entry(ies)', '');
-        termLine('  CHAT BACKUP  ' + CHATS.length + ' session(s)', '');
-        termLine('  record     ' + TIMELINE.length + ' event(s)', '');
-        termLine('  COMMISSIONS  ' + COMMISSIONS.length + ' file(s)', '');
-        termLine('  PAIRFRAMES   ' + PAIRFRAMES.length + ' file(s)', '');
+        termLine('  SYSTEM        PLANET.EARTH / AKASHA', '');
+        termLine('  COMMISSION    ' + COMMISSIONS.length + ' file(s)', '');
+        termLine('  PAIRFRAME     ' + PAIRFRAMES.length + ' file(s)', '');
+        termLine('  LOG           ' + LOGS.length + ' entry(ies)', '');
+        termLine('  MESSAGE       ' + CHATS.length + ' session(s)', '');
+        termLine('  CHARACTER     ' + CHARACTERS.length + ' record(s)', '');
+        termLine('  RECORD        ' + TIMELINE.length + ' event(s)', '');
       },
       ping: function (args) {
         var target = args.join(' ').trim();
@@ -1413,13 +1413,13 @@
         termLine('  [관리자 권한이 필요한 작업은 수행할 수 없습니다.]', 'dim');
       },
       ls: function () {
-        termLine('[/us/ 디렉토리 파일 목록]', 'info');
-        termLine('  commission/    ' + COMMISSIONS.length + ' file(s)', '');
-        termLine('  pairframe/     ' + PAIRFRAMES.length + ' file(s)', '');
-        termLine('  log.txt        ' + LOGS.length + ' entry(ies)', '');
-        termLine('  chat.bak       ' + CHATS.length + ' session(s)', '');
-        termLine('  registry/      ' + CHARACTERS.length + ' record(s)', '');
-        termLine('  record       ' + TIMELINE.length + ' event(s)', '');
+        termLine('[/Akasha/ 디렉토리 파일 목록]', 'info');
+        termLine('  commission.img/  ' + COMMISSIONS.length + ' file(s)', '');
+        termLine('  pairframe.img/   ' + PAIRFRAMES.length + ' file(s)', '');
+        termLine('  log.txt          ' + LOGS.length + ' entry(ies)', '');
+        termLine('  message.chat     ' + CHATS.length + ' session(s)', '');
+        termLine('  character.wiki/  ' + CHARACTERS.length + ' record(s)', '');
+        termLine('  record.sys       ' + TIMELINE.length + ' event(s)', '');
       },
       cat: function (args) {
         var f = args.join(' ').trim().toLowerCase();
@@ -1441,8 +1441,8 @@
         var path = args.join(' ').trim().toLowerCase();
         if (!path) { termLine('[오류: 경로를 지정해 주세요.]', 'alert'); return; }
         var lines;
-        if (path === 'us' || path === '/us' || path === '/us/') {
-          termLine('[/us/ 영역에 대한 접근을 요청합니다...]', '');
+        if (path === 'akasha' || path === '/akasha' || path === '/akasha/' || path === 'us' || path === '/us' || path === '/us/') {
+          termLine('[/Akasha/ 영역에 대한 접근을 요청합니다...]', '');
           lines = TERMINAL.accessUs;
         } else if (path === 'admin' || path === '/admin') {
           termLine('[관리자 영역 접근 시도...]', '');
