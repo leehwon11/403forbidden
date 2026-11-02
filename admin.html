@@ -88,8 +88,8 @@ body{margin:0;overflow:hidden;background:var(--desk)}
       <button type="button" class="tab" data-tab="commissions" aria-pressed="false">커미션<span class="tab-badge" id="badge-commissions"></span></button>
       <button type="button" class="tab" data-tab="pairframes" aria-pressed="false">페어틀<span class="tab-badge" id="badge-pairframes"></span></button>
       <button type="button" class="tab" data-tab="logs" aria-pressed="false">글 로그<span class="tab-badge" id="badge-logs"></span></button>
-      <button type="button" class="tab" data-tab="chats" aria-pressed="false">메신저<span class="tab-badge" id="badge-chats"></span></button>
-      <button type="button" class="tab" data-tab="timeline" aria-pressed="false">타임라인<span class="tab-badge" id="badge-timeline"></span></button>
+      <button type="button" class="tab" data-tab="messages" aria-pressed="false">메시지<span class="tab-badge" id="badge-messages"></span></button>
+      <button type="button" class="tab" data-tab="records" aria-pressed="false">타임라인<span class="tab-badge" id="badge-records"></span></button>
       <button type="button" class="tab" data-tab="boot" aria-pressed="false">부팅</button>
       <button type="button" class="tab" data-tab="entry" aria-pressed="false">입구</button>
       <button type="button" class="tab" data-tab="terminal" aria-pressed="false">터미널</button>
@@ -123,7 +123,7 @@ body{margin:0;overflow:hidden;background:var(--desk)}
 (async function(){
 
 /* ======== 나루 SDK ======== */
-var COLS=['site','characters','commissions','pairframes','logs','chats','timeline','terminal'];
+var COLS=['site','characters','commissions','pairframes','logs','messages','records','terminal'];
 var naru=null,adm=null;
 try{
   var mod=await import('https://sdk.naru.pub/sdk/1.0.0/naru.js');
@@ -163,8 +163,8 @@ async function loadFromNaru(){
     if(docs[2])D.commissions=docs[2].data;
     if(docs[3])D.pairframes=docs[3].data;
     if(docs[4])D.logs=docs[4].data;
-    if(docs[5])D.chats=docs[5].data;
-    if(docs[6])D.timeline=docs[6].data;
+    if(docs[5])D.messages=docs[5].data;
+    if(docs[6])D.records=docs[6].data;
     if(docs[7])D.terminal=docs[7].data;
     persist();return true;
   }catch(e){return false}
@@ -197,8 +197,8 @@ document.getElementById('gate-login').addEventListener('click',function(){
 document.getElementById('btn-save').addEventListener('click',async function(){
   if(!adm)return;
   try{
-    var keys=['site','characters','commissions','pairframes','logs','chats','timeline','terminal'];
-    var vals=[D.site,D.characters,D.commissions,D.pairframes,D.logs,D.chats,D.timeline,D.terminal];
+    var keys=['site','characters','commissions','pairframes','logs','messages','records','terminal'];
+    var vals=[D.site,D.characters,D.commissions,D.pairframes,D.logs,D.messages,D.records,D.terminal];
     await adm.batch(keys.map(function(k,i){
       return {collection:k,set:{id:'config',data:vals[i]}};
     }));
@@ -213,7 +213,7 @@ document.getElementById('btn-save').addEventListener('click',async function(){
 /* ======== 데이터 ======== */
 var D=JSON.parse(JSON.stringify({
   site:SITE,characters:CHARACTERS,commissions:COMMISSIONS,
-  pairframes:PAIRFRAMES,logs:LOGS,chats:CHATS,timeline:TIMELINE,terminal:TERMINAL
+  pairframes:PAIRFRAMES,logs:LOGS,messages:CHATS,records:TIMELINE,terminal:TERMINAL
 }));
 try{var sv=localStorage.getItem('admin403');if(sv)D=JSON.parse(sv)}catch(e){}
 
@@ -246,7 +246,7 @@ var ed=document.getElementById('ed'),curTab='site';
 
 function updateBadges(){
   var counts={characters:D.characters.length,commissions:D.commissions.length,
-    pairframes:D.pairframes.length,logs:D.logs.length,chats:D.chats.length,timeline:D.timeline.length};
+    pairframes:D.pairframes.length,logs:D.logs.length,messages:D.messages.length,records:D.records.length};
   Object.keys(counts).forEach(function(k){
     var el=document.getElementById('badge-'+k);
     if(el)el.textContent=counts[k];
@@ -254,7 +254,7 @@ function updateBadges(){
 }
 
 function render(){
-  var fn={site:rSite,characters:rChars,commissions:rComm,pairframes:rPair,logs:rLogs,chats:rChats,timeline:rTL,boot:rBoot,entry:rEntry,terminal:rTerm};
+  var fn={site:rSite,characters:rChars,commissions:rComm,pairframes:rPair,logs:rLogs,messages:rChats,records:rTL,boot:rBoot,entry:rEntry,terminal:rTerm};
   (fn[curTab]||rSite)();
   updateBadges();
   var scroll=document.getElementById('adm-scroll');
@@ -371,13 +371,13 @@ function rLogs(){
 }
 
 function rChats(){
-  ed.innerHTML='<div class="adm">'+D.chats.map(function(room,i){
-    var p='chats.'+i;
+  ed.innerHTML='<div class="adm">'+D.messages.map(function(room,i){
+    var p='messages.'+i;
     return '<div class="adm-card collapsed">'+
       '<div class="adm-card-head" data-action="toggle"><span class="adm-card-title">CHAT #'+(i+1)+(room.title?' — '+esc(room.title):'')+'</span>'+
       '<span class="adm-card-toggle"></span></div>'+
       '<div class="adm-card-body">'+
-      '<div style="text-align:right;margin-bottom:8px"><button type="button" class="adm-rm" data-action="rm" data-key="chats" data-i="'+i+'">삭제</button></div>'+
+      '<div style="text-align:right;margin-bottom:8px"><button type="button" class="adm-rm" data-action="rm" data-key="messages" data-i="'+i+'">삭제</button></div>'+
       '<div class="adm-pair">'+rw('제목',inp(p+'.title','대화 백업 제목'))+rw('날짜',inp(p+'.date','YYYY.MM.DD'))+'</div>'+
       rw('상황',inp(p+'.about','상황 한 줄'))+
       '<div class="adm-sec">메시지</div>'+
@@ -392,11 +392,11 @@ function rChats(){
       '<button type="button" class="adm-add" data-action="add-msg" data-ci="'+i+'" style="margin-top:4px">+ 메시지 추가</button>'+
     '</div></div>';
   }).join('')+
-  '<button type="button" class="adm-add" data-action="add" data-key="chats">+ 대화 추가</button></div>';
+  '<button type="button" class="adm-add" data-action="add" data-key="messages">+ 대화 추가</button></div>';
 }
 
 function rTL(){
-  rArr('timeline','타임라인',function(p){
+  rArr('records','타임라인',function(p){
     return '<div class="adm-pair">'+rw('날짜',inp(p+'.date','YYYY.MM'))+rw('상태 코드',inp(p+'.code','403 FORBIDDEN'))+'</div>'+
       '<div class="adm-pair">'+rw('타입',sel(p+'.type',[['','기본 (흰색)'],['deny','거절 (빨강)'],['ok','열림 (초록)']]))+rw('제목',inp(p+'.title','사건 제목'))+'</div>'+
       rw('설명',inp(p+'.desc','사건 설명'));
@@ -502,8 +502,8 @@ var DEFAULTS={
   commissions:{src:'',tag:'투샷',artist:'',date:'',note:''},
   pairframes:{src:'',tag:'투샷',title:'',maker:'',date:'',note:''},
   logs:{title:'',date:'',pov:'',password:'',body:['']},
-  chats:{title:'',date:'',about:'',messages:[{from:'system',text:'',time:''}]},
-  timeline:{date:'',code:'',type:'',title:'',desc:''}
+  messages:{title:'',date:'',about:'',messages:[{from:'system',text:'',time:''}]},
+  records:{date:'',code:'',type:'',title:'',desc:''}
 };
 
 ed.addEventListener('click',function(e){
@@ -516,8 +516,8 @@ ed.addEventListener('click',function(e){
   if(a==='rm-row'){D.characters[+b.dataset.ci].rows.splice(+b.dataset.ri,1);persist();render();}
   if(a==='add-para'){D.logs[+b.dataset.li].body.push('');persist();render();}
   if(a==='rm-para'){D.logs[+b.dataset.li].body.splice(+b.dataset.pi,1);persist();render();}
-  if(a==='add-msg'){D.chats[+b.dataset.ci].messages.push({from:'haein',text:'',time:''});persist();render();}
-  if(a==='rm-msg'){D.chats[+b.dataset.ci].messages.splice(+b.dataset.mi,1);persist();render();}
+  if(a==='add-msg'){D.messages[+b.dataset.ci].messages.push({from:'haein',text:'',time:''});persist();render();}
+  if(a==='rm-msg'){D.messages[+b.dataset.ci].messages.splice(+b.dataset.mi,1);persist();render();}
   if(a==='upload'){
     var target=b.dataset.target;
     var fi=document.createElement('input');fi.type='file';fi.accept='image/*';
@@ -642,7 +642,7 @@ document.getElementById('btn-export').addEventListener('click',function(){
   L.push('');
   L.push("/* ---------- 메신저 ---------- */");
   L.push('const CHATS = [');
-  D.chats.forEach(function(r,ri){
+  D.messages.forEach(function(r,ri){
     L.push('  {');
     L.push("    title: "+q(r.title)+", date: "+q(r.date)+", about: "+q(r.about)+",");
     L.push('    messages: [');
@@ -653,14 +653,14 @@ document.getElementById('btn-export').addEventListener('click',function(){
       L.push('      '+parts+(mi<r.messages.length-1?',':''));
     });
     L.push('    ]');
-    L.push('  }'+(ri<D.chats.length-1?',':''));
+    L.push('  }'+(ri<D.messages.length-1?',':''));
   });
   L.push('];');
   L.push('');
   L.push("/* ---------- 타임라인 ---------- */");
   L.push('const TIMELINE = [');
-  D.timeline.forEach(function(t,i){
-    L.push("  { date: "+q(t.date)+", code: "+q(t.code)+", type: "+q(t.type)+", title: "+q(t.title)+", desc: "+q(t.desc)+" }"+(i<D.timeline.length-1?',':''));
+  D.records.forEach(function(t,i){
+    L.push("  { date: "+q(t.date)+", code: "+q(t.code)+", type: "+q(t.type)+", title: "+q(t.title)+", desc: "+q(t.desc)+" }"+(i<D.records.length-1?',':''));
   });
   L.push('];');
   L.push('');
@@ -695,7 +695,7 @@ document.getElementById('btn-reset').addEventListener('click',async function(){
   }
   D=JSON.parse(JSON.stringify({
     site:SITE,characters:CHARACTERS,commissions:COMMISSIONS,
-    pairframes:PAIRFRAMES,logs:LOGS,chats:CHATS,timeline:TIMELINE,terminal:TERMINAL
+    pairframes:PAIRFRAMES,logs:LOGS,messages:CHATS,records:TIMELINE,terminal:TERMINAL
   }));
   try{localStorage.removeItem('admin403')}catch(e){}
   render();

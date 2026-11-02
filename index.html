@@ -372,8 +372,8 @@
         new Promise(function (_, r) { setTimeout(r, 3000); })
       ]);
       var naru = mod.createNaru();
-      var COLS = ['site','characters','commissions','pairframes','logs','chats','record','terminal'];
-      var GLOBALS = [SITE, CHARACTERS, COMMISSIONS, PAIRFRAMES, LOGS, CHATS, record, TERMINAL];
+      var COLS = ['site','characters','commissions','pairframes','logs','messages','records','terminal'];
+      var GLOBALS = [SITE, CHARACTERS, COMMISSIONS, PAIRFRAMES, LOGS, CHATS, TIMELINE, TERMINAL];
       var docs = await Promise.all(COLS.map(function (c) {
         return naru.collection(c).get('config').catch(function () { return null; });
       }));
