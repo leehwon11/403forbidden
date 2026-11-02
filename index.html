@@ -653,7 +653,7 @@
         ? '<img src="' + esc(it.src) + '" alt="' + esc(caption(it)) + '">'
         : esc(fileName(cur) + ' · 원본 크기');
       vCap.textContent = caption(it) + ' · ' + sub(it);
-      vNote.textContent = it.note || '';
+      vNote.innerHTML = escBr(it.note || '');
       if (viewer.hidden) lastFocus = document.activeElement;
       viewer.hidden = false;
       viewer.querySelector('.viewer-close').focus();
@@ -859,7 +859,7 @@
       reader.innerHTML = status +
         '<h1>' + esc(p.title) + '</h1>' +
         '<div class="reader-meta">' + esc(p.date) + ' · 시점 ' + esc(p.pov) + '</div>' +
-        '<div class="prose">' + p.body.map(function (t) { return '<p>' + esc(t) + '</p>'; }).join('') + '</div>' +
+        '<div class="prose">' + p.body.map(function (t) { return '<p>' + escBr(t) + '</p>'; }).join('') + '</div>' +
         navBtns();
       if (justOpened) replay(reader, 'pop');
     }
@@ -936,11 +936,11 @@
     }
 
     function msgHtml(m) {
-      if (m.from === 'system') return '<div class="sys">[' + esc(m.text) + ']</div>';
-      if (m.from === 'error') return '<div class="sys sys--error">[' + esc(m.text) + ']</div>';
-      if (m.from === 'dohun') return '<div class="msg msg--me"><div class="bubble">' + esc(m.text) + '</div><time>' + esc(m.time) + '</time></div>';
+      if (m.from === 'system') return '<div class="sys">[' + escBr(m.text) + ']</div>';
+      if (m.from === 'error') return '<div class="sys sys--error">[' + escBr(m.text) + ']</div>';
+      if (m.from === 'dohun') return '<div class="msg msg--me"><div class="bubble">' + escBr(m.text) + '</div><time>' + esc(m.time) + '</time></div>';
       return '<div class="msg"><span class="msg-face">' + media(haein.face, '해인', haein.name) + '</span>' +
-        '<div><span class="msg-name">' + esc(haein.name) + '</span><div class="bubble">' + esc(m.text) + '</div></div>' +
+        '<div><span class="msg-name">' + esc(haein.name) + '</span><div class="bubble">' + escBr(m.text) + '</div></div>' +
         '<time>' + esc(m.time) + '</time></div>';
     }
 
@@ -1052,7 +1052,7 @@
           '<div class="portrait">' + media(c.portrait, 'PORTRAIT', c.name) + '</div>' +
           '<div class="statbox">' +
             '<div class="statbox-head"><strong>' + esc(c.name) + '</strong><small>' + esc(c.tag) + '</small></div>' +
-            '<dl class="stats">' + c.rows.map(function (r) { return '<dt>' + esc(r[0]) + '</dt><dd>' + esc(r[1]) + '</dd>'; }).join('') + '</dl>' +
+            '<dl class="stats">' + c.rows.map(function (r) { return '<dt>' + esc(r[0]) + '</dt><dd>' + escBr(r[1]) + '</dd>'; }).join('') + '</dl>' +
           '</div>' +
         '</div>' +
         '<div class="wiki-actions" style="display:flex;gap:8px;margin:12px 0">' +
@@ -1060,12 +1060,12 @@
           '<button type="button" class="btn btn--flat" data-action="idcard" style="font-family:var(--pixel);font-size:11px;letter-spacing:1px">[REGISTRATION CARD]</button>' +
         '</div>' +
         '<div class="wiki-cols">' +
-          '<section class="panel"><h2>[보유 특성]</h2><div>' + esc(c.traits) + '</div></section>' +
-          '<section class="panel"><h2>[관계]</h2><div>대상: ' + esc(c.other) + '\n권한: 있음\n접근: <span style="color:var(--green)">허용됨</span>\n' + esc(c.relation) + '</div></section>' +
+          '<section class="panel"><h2>[보유 특성]</h2><div>' + escBr(c.traits) + '</div></section>' +
+          '<section class="panel"><h2>[관계]</h2><div>대상: ' + esc(c.other) + '<br>권한: 있음<br>접근: <span style="color:var(--green)">허용됨</span><br>' + escBr(c.relation) + '</div></section>' +
         '</div>' +
-        collapseSection('외형', '<section class="panel panel--sheet"><p>' + esc(c.appearance || '') + '</p></section>', false) +
-        collapseSection('성격', '<section class="panel panel--sheet"><p>' + esc(c.personality || '') + '</p></section>', false) +
-        collapseSection('배경', '<section class="panel panel--sheet"><p>' + esc(c.background || '') + '</p></section>', false) +
+        collapseSection('외형', '<section class="panel panel--sheet"><p>' + escBr(c.appearance || '') + '</p></section>', false) +
+        collapseSection('성격', '<section class="panel panel--sheet"><p>' + escBr(c.personality || '') + '</p></section>', false) +
+        collapseSection('배경', '<section class="panel panel--sheet"><p>' + escBr(c.background || '') + '</p></section>', false) +
         '<div class="wiki-cols">' +
           '<section class="panel"><h2>[좋아하는 것]</h2>' + listHtml(c.likes) + '</section>' +
           '<section class="panel"><h2>[싫어하는 것]</h2>' + listHtml(c.dislikes) + '</section>' +
@@ -1073,7 +1073,7 @@
         '<section class="panel" style="border:2px solid var(--red);position:relative">' +
           '<h2 style="color:var(--red)">[스포일러 구역]</h2>' +
           (spoilerRevealed[cur]
-            ? '<div class="panel--sheet" style="padding:12px"><p>' + esc(c.spoiler || '') + '</p></div>'
+            ? '<div class="panel--sheet" style="padding:12px"><p>' + escBr(c.spoiler || '') + '</p></div>'
             : '<div style="padding:12px;text-align:center;color:var(--muted)">[이 구역의 내용은 숨겨져 있습니다.]<br>' +
               '<button type="button" class="btn" data-action="spoiler" style="margin-top:8px">열람 요청</button></div>') +
         '</section>';
@@ -1131,7 +1131,7 @@
         '<div class="tl-rail" aria-hidden="true"><span class="tl-dot"></span><span class="tl-line"></span></div>' +
         '<div class="tl-body">' +
           '<div class="tl-head"><span class="chip">' + esc(ev.code) + '</span><span class="tl-title">' + esc(ev.title) + '</span></div>' +
-          '<div class="tl-desc">' + esc(ev.desc) + '</div>' +
+          '<div class="tl-desc">' + escBr(ev.desc) + '</div>' +
         '</div></li>';
     }).join('');
   }
@@ -1140,23 +1140,24 @@
   function openStatWin(c) {
     var modal = document.getElementById('stat-modal');
     document.getElementById('stat-title').textContent = 'STATUS — ' + c.name;
-    var grade = (c.rows.find(function (r) { return r[0] === '등급'; }) || ['', ''])[1];
-    var status = (c.rows.find(function (r) { return r[0] === '상태'; }) || ['', ''])[1];
-    var affiliation = (c.rows.find(function (r) { return r[0] === '소속'; }) || ['', ''])[1];
+    var statRows = '';
+    c.rows.forEach(function (r) {
+      if (r[0] && r[0] !== '등록번호' && r[0] !== '분류') {
+        statRows += '<div class="stat-row"><span>' + esc(r[0]) + '</span><span>' + escBr(r[1]) + '</span></div>';
+      }
+    });
     document.getElementById('stat-body').innerHTML =
       '<div style="text-align:center;margin-bottom:12px">' +
         '<div class="stat-face">' + media(c.face, 'FACE', c.name) + '</div>' +
         '<div style="font-family:var(--pixel);font-size:14px;margin-top:8px">' + esc(c.name) + '</div>' +
         '<div style="font-size:12px;color:var(--muted)">' + esc(c.tag) + '</div>' +
       '</div>' +
-      '<div class="stat-row"><span>등급</span><span>' + esc(grade) + '</span></div>' +
-      '<div class="stat-row"><span>상태</span><span>' + esc(status) + '</span></div>' +
-      '<div class="stat-row"><span>소속</span><span>' + esc(affiliation) + '</span></div>' +
+      statRows +
       '<div class="stat-row"><span>관계 대상</span><span>' + esc(c.other) + '</span></div>' +
       '<div class="stat-row"><span>접근 권한</span><span style="color:var(--green)">허용됨</span></div>' +
       '<div style="margin-top:12px;padding:8px;border:1px solid var(--border,var(--ink));font-size:12px">' +
         '<div style="font-family:var(--pixel);font-size:11px;margin-bottom:4px">TRAITS</div>' +
-        esc(c.traits).replace(/\n/g, '<br>') +
+        escBr(c.traits) +
       '</div>';
     modal.hidden = false;
     replay(modal.querySelector('.win'), 'pop');
@@ -1175,8 +1176,15 @@
     var modal = document.getElementById('idcard-modal');
     var regNo = (c.rows.find(function (r) { return r[0] === '등록번호'; }) || ['', ''])[1];
     var cls = (c.rows.find(function (r) { return r[0] === '분류'; }) || ['', ''])[1];
-    var grade = (c.rows.find(function (r) { return r[0] === '등급'; }) || ['', ''])[1];
-    var status = (c.rows.find(function (r) { return r[0] === '상태'; }) || ['', ''])[1];
+    var idLabels = { '등록번호': 'REG. NO.', '분류': 'CLASS', '등급': 'GRADE', '상태': 'STATUS' };
+    var extraFields = '';
+    c.rows.forEach(function (r) {
+      if (r[0] && !idLabels[r[0]]) {
+        extraFields += '<div class="id-card-field"><dt>' + esc(r[0].toUpperCase()) + '</dt><dd>' + escBr(r[1]) + '</dd></div>';
+      }
+    });
+    var gradeRow = c.rows.find(function (r) { return r[0] === '등급'; });
+    var statusRow = c.rows.find(function (r) { return r[0] === '상태'; });
     var bars = '';
     for (var i = 0; i < 32; i++) {
       var h = 8 + Math.floor(Math.random() * 13);
@@ -1194,8 +1202,8 @@
               '<div class="id-card-field"><dt>REG. NO.</dt><dd>' + esc(regNo) + '</dd></div>' +
               '<div class="id-card-field"><dt>CLASS</dt><dd>' + esc(cls) + '</dd></div>' +
               '<div class="id-card-field"><dt>TAG</dt><dd>' + esc(c.tag) + '</dd></div>' +
-              '<div class="id-card-field"><dt>GRADE</dt><dd>' + esc(grade) + '</dd></div>' +
-              '<div class="id-card-field"><dt>STATUS</dt><dd>' + esc(status) + '</dd></div>' +
+              (gradeRow ? '<div class="id-card-field"><dt>GRADE</dt><dd>' + escBr(gradeRow[1]) + '</dd></div>' : '') +
+              (statusRow ? '<div class="id-card-field"><dt>STATUS</dt><dd>' + escBr(statusRow[1]) + '</dd></div>' : '') +
               '<div class="id-card-field"><dt>PAIR</dt><dd>' + esc(c.other) + '</dd></div>' +
             '</dl>' +
           '</div>' +

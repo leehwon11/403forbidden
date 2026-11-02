@@ -3,6 +3,7 @@
 function esc(s) {
   return String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
+function escBr(s) { return esc(s).replace(/\n/g, '<br>'); }
 
 function media(src, label, alt) {
   if (src) return `<img class="media" src="${esc(src)}" alt="${esc(alt || label)}" loading="lazy">`;

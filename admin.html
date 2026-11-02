@@ -297,7 +297,7 @@ function rChars(){
       c.rows.map(function(r,ri){
         return '<div class="adm-pair" style="margin-bottom:4px">'+
           '<input data-p="'+p+'.rows.'+ri+'.0" value="'+esc(r[0])+'" placeholder="항목명">'+
-          '<div style="display:flex;gap:4px"><input data-p="'+p+'.rows.'+ri+'.1" value="'+esc(r[1])+'" placeholder="값" style="flex:1">'+
+          '<div style="display:flex;gap:4px"><textarea data-p="'+p+'.rows.'+ri+'.1" rows="1" placeholder="값" style="flex:1;resize:vertical">'+esc(r[1])+'</textarea>'+
           '<button type="button" class="adm-rm" data-action="move-sub-up" data-arr="characters.'+ci+'.rows" data-i="'+ri+'"'+(ri===0?' disabled':'')+' style="font-size:10px;padding:1px 4px">&#9650;</button>'+
           '<button type="button" class="adm-rm" data-action="move-sub-dn" data-arr="characters.'+ci+'.rows" data-i="'+ri+'"'+(ri>=c.rows.length-1?' disabled':'')+' style="font-size:10px;padding:1px 4px">&#9660;</button>'+
           '<button type="button" class="adm-rm" data-action="rm-row" data-ci="'+ci+'" data-ri="'+ri+'">X</button></div></div>';
