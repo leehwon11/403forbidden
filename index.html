@@ -572,6 +572,8 @@
 
   function initGallery(cfg) {
     var scope = cfg.scope;
+    if (scope._galleryInit) { return; }
+    scope._galleryInit = true;
     var items = cfg.items;
     var prefix = cfg.prefix;
     var caption = cfg.caption;
@@ -762,6 +764,8 @@
   }
 
   function initLog() {
+    if (initLog._done) return;
+    initLog._done = true;
     var explorer = document.getElementById('log-explorer');
     var backbar = document.getElementById('log-backbar');
     var curPath = document.getElementById('log-cur-path');
@@ -884,6 +888,8 @@
   }
 
   function initMessenger() {
+    if (initMessenger._done) return;
+    initMessenger._done = true;
     var explorer = document.getElementById('msg-explorer');
     var backbar = document.getElementById('msg-backbar');
     var curPath = document.getElementById('msg-cur-path');
@@ -1017,6 +1023,8 @@
   }
 
   function initWiki() {
+    if (initWiki._done) return;
+    initWiki._done = true;
     var tabs = document.getElementById('wiki-tabs');
     var character = document.getElementById('wiki-content');
     var cur = 0;
@@ -1115,6 +1123,8 @@
   }
 
   function initTimeline() {
+    if (initTimeline._done) return;
+    initTimeline._done = true;
     document.getElementById('tl-list').innerHTML = TIMELINE.map(function (ev) {
       return '<li class="' + (ev.type === 'deny' ? 'is-deny' : ev.type === 'ok' ? 'is-ok' : '') + '">' +
         '<div class="tl-date">' + esc(ev.date) + '</div>' +
