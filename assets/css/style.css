@@ -127,7 +127,7 @@ button, input { font-family: inherit; }
 
 /* ---------- 알림 토스트 ---------- */
 .toast {
-  position: fixed; right: 20px; bottom: 20px; z-index: 50;
+  position: fixed; right: 20px; bottom: 108px; z-index: 50;
   background: var(--ink); color: var(--paper);
   padding: 12px 16px; font-size: 13px;
   box-shadow: 3px 3px 0 #6b7380;
@@ -656,7 +656,7 @@ body::after {
 }
 .notice-btn:hover { background: var(--bar); border-color: var(--paper); }
 .notice-btn::before { content: '\25A0'; font-size: 8px; }
-.admin-btn { left: auto; right: 16px; bottom: 60px; text-decoration: none; }
+.admin-btn { left: auto; right: 16px; bottom: 62px; text-decoration: none; }
 .admin-btn::before { content: '\25B6'; }
 
 /* ---------- 공지 모달 ---------- */
