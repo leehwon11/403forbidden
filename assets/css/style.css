@@ -607,6 +607,11 @@ a, button, [role="button"], label, select, summary { cursor: pointer; }
   font-family: var(--pixel); font-size: 10px; color: var(--muted);
 }
 
+/* ---------- 글 로그 / 메시지 익스플로러 ---------- */
+.explorer-row--log, .explorer-head--log { grid-template-columns: 24px 1fr 80px 50px; }
+.explorer-row--msg, .explorer-head--msg { grid-template-columns: 24px 1fr 80px 1fr; }
+.explorer-sub { font-size: 11px; color: var(--muted); margin-left: 6px; }
+
 /* ---------- 텍스트 선택 색상 ---------- */
 ::selection { background: var(--bar); color: var(--white); }
 ::-moz-selection { background: var(--bar); color: var(--white); }

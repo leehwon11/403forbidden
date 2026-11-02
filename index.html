@@ -169,7 +169,12 @@
         <h1 class="win-title" style="margin:0;font-weight:400">LOG.TXT</h1>
         <a href="#home">← 메뉴</a>
       </div>
-      <div class="split">
+      <div id="log-explorer"></div>
+      <div class="explorer-bar" id="log-backbar" hidden>
+        <button type="button" class="explorer-view-btn" id="log-back-btn">← FILE LIST</button>
+        <span class="explorer-path" id="log-cur-path"></span>
+      </div>
+      <div class="split" id="log-split" hidden>
         <nav class="side" aria-label="글 목록">
           <div class="side-head label">ENTRIES</div>
           <div id="log-list"></div>
@@ -186,13 +191,18 @@
         <h1 class="win-title" style="margin:0;font-weight:400">MESSAGE.CHAT</h1>
         <a href="#home">← 메뉴</a>
       </div>
-      <div class="split">
+      <div id="msg-explorer"></div>
+      <div class="explorer-bar" id="msg-backbar" hidden>
+        <button type="button" class="explorer-view-btn" id="msg-back-btn">← FILE LIST</button>
+        <span class="explorer-path" id="msg-cur-path"></span>
+      </div>
+      <div class="split" id="msg-split" hidden>
         <nav class="side" aria-label="대화 백업 목록">
           <div class="side-head label">BACKUP FILES</div>
           <div id="msg-rooms"></div>
         </nav>
         <div class="chat">
-          <div class="chat-head"><span>현도훈 · 모해인</span><small id="msg-title"></small></div>
+          <div class="chat-head"><span id="msg-head-title"></span></div>
           <div class="chat-log" id="msg-log" aria-live="polite"></div>
           <div class="chat-input">
             <label for="chat-in" class="sr-only">메시지 입력</label>
@@ -752,6 +762,10 @@
   }
 
   function initLog() {
+    var explorer = document.getElementById('log-explorer');
+    var backbar = document.getElementById('log-backbar');
+    var curPath = document.getElementById('log-cur-path');
+    var split = document.getElementById('log-split');
     var list = document.getElementById('log-list');
     var reader = document.getElementById('log-reader');
     var unlocked = {};
@@ -759,6 +773,37 @@
     var wrong = 0;
     var no = function (i) { return String(i + 1).padStart(3, '0'); };
     var isLocked = function (i) { return !!LOGS[i].password && !unlocked[i]; };
+    var fileIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3h8l5 5v13H6z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 16h4"/></svg>';
+
+    function renderExplorer() {
+      explorer.innerHTML =
+        '<div class="explorer-bar"><span>PATH:</span><span class="explorer-path">C:\\SYSTEM\\us\\log\\</span></div>' +
+        '<div class="explorer-head explorer-head--log"><span></span><span>NAME</span><span>DATE</span><span>STATUS</span></div>' +
+        LOGS.map(function (p, i) {
+          var st = p.password ? (unlocked[i] ? '200' : '403') : '';
+          return '<button type="button" class="explorer-row explorer-row--log" data-i="' + i + '">' +
+            '<span class="explorer-icon">' + fileIcon + '</span>' +
+            '<span class="explorer-name">LOG_' + no(i) + '.txt<small class="explorer-sub"> — ' + esc(p.title) + '</small></span>' +
+            '<span class="explorer-meta">' + esc(p.date) + '</span>' +
+            '<span class="explorer-meta">' + esc(st) + '</span></button>';
+        }).join('');
+    }
+
+    function showExplorer() {
+      renderExplorer();
+      explorer.hidden = false;
+      backbar.hidden = true;
+      split.hidden = true;
+    }
+
+    function showSplit(i) {
+      sel = i; wrong = 0;
+      explorer.hidden = true;
+      backbar.hidden = false;
+      split.hidden = false;
+      curPath.textContent = 'C:\\SYSTEM\\us\\log\\LOG_' + no(sel) + '.txt';
+      renderList(); renderReader(true);
+    }
 
     function renderList() {
       list.innerHTML = LOGS.map(function (p, i) {
@@ -776,12 +821,13 @@
 
     function renderReader(justOpened) {
       var p = LOGS[sel];
+      curPath.textContent = 'C:\\SYSTEM\\us\\log\\LOG_' + no(sel) + '.txt';
       if (isLocked(sel)) {
         reader.innerHTML =
           '<div class="lockwrap"><div class="win lockbox" id="lockbox">' +
           '<div class="win-bar win-bar--deny"><span class="win-title" style="font-size:13px">ACCESS DENIED — 403</span></div>' +
           '<form class="lockbox-body" id="lockform">' +
-          "<div>[‘" + esc(p.title) + "’ 은(는) 잠긴 로그입니다.]<br>[열람하려면 비밀번호가 필요합니다.]</div>" +
+          "<div>['" + esc(p.title) + "' 은(는) 잠긴 로그입니다.]<br>[열람하려면 비밀번호가 필요합니다.]</div>" +
           '<label for="pw">비밀번호 · [힌트 자리]</label>' +
           '<input id="pw" type="password" autocomplete="off">' +
           (wrong ? '<div class="lockbox-error" role="alert">[비밀번호 불일치 — 접근이 거부되었습니다.]</div>' : '') +
@@ -819,6 +865,13 @@
       wrong = 0; renderList(); renderReader(false);
     }
 
+    explorer.addEventListener('click', function (e) {
+      var b = e.target.closest('.explorer-row');
+      if (b) { showSplit(Number(b.dataset.i)); sfx('click'); }
+    });
+    document.getElementById('log-back-btn').addEventListener('click', function () {
+      showExplorer(); sfx('click');
+    });
     list.addEventListener('click', function (e) {
       var b = e.target.closest('.side-item');
       if (b) go(Number(b.dataset.i));
@@ -827,15 +880,54 @@
       var b = e.target.closest('[data-go]');
       if (b) go(sel + Number(b.dataset.go));
     });
-    renderList(); renderReader(false);
+    renderExplorer();
   }
 
   function initMessenger() {
+    var explorer = document.getElementById('msg-explorer');
+    var backbar = document.getElementById('msg-backbar');
+    var curPath = document.getElementById('msg-cur-path');
+    var split = document.getElementById('msg-split');
     var rooms = document.getElementById('msg-rooms');
     var log = document.getElementById('msg-log');
+    var headTitle = document.getElementById('msg-head-title');
     var haein = CHARACTERS.find(function (c) { return c.id === 'haein'; }) || { name: '모해인', face: '' };
     var sel = 0;
     var replayTimer = null;
+    var no = function (i) { return String(i + 1).padStart(3, '0'); };
+    var fileIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16v12H8l-4 4z"/><path d="M9 9h6M9 12h3"/></svg>';
+
+    function renderExplorer() {
+      explorer.innerHTML =
+        '<div class="explorer-bar"><span>PATH:</span><span class="explorer-path">C:\\SYSTEM\\us\\message\\</span></div>' +
+        '<div class="explorer-head explorer-head--msg"><span></span><span>NAME</span><span>DATE</span><span>NOTE</span></div>' +
+        CHATS.map(function (r, i) {
+          return '<button type="button" class="explorer-row explorer-row--msg" data-i="' + i + '">' +
+            '<span class="explorer-icon">' + fileIcon + '</span>' +
+            '<span class="explorer-name">MSG_' + no(i) + '.bak<small class="explorer-sub"> — ' + esc(r.title) + '</small></span>' +
+            '<span class="explorer-meta">' + esc(r.date) + '</span>' +
+            '<span class="explorer-meta">' + esc(r.about) + '</span></button>';
+        }).join('');
+    }
+
+    function showExplorer() {
+      if (replayTimer) { clearTimeout(replayTimer); replayTimer = null; }
+      renderExplorer();
+      explorer.hidden = false;
+      backbar.hidden = true;
+      split.hidden = true;
+    }
+
+    function showSplit(i) {
+      sel = i;
+      explorer.hidden = true;
+      backbar.hidden = false;
+      split.hidden = false;
+      curPath.textContent = 'C:\\SYSTEM\\us\\message\\MSG_' + no(sel) + '.bak';
+      headTitle.textContent = CHATS[sel].title;
+      renderRooms();
+      replayChat();
+    }
 
     function msgHtml(m) {
       if (m.from === 'system') return '<div class="sys">[' + esc(m.text) + ']</div>';
@@ -902,15 +994,26 @@
         return '<button type="button" class="side-item" data-i="' + i + '" aria-current="' + (i === sel) + '">' +
           '<span>' + esc(r.title) + '</span><small>' + esc(r.date) + ' · ' + esc(r.about) + '</small></button>';
       }).join('');
-      document.getElementById('msg-title').textContent = CHATS[sel].title;
     }
 
+    explorer.addEventListener('click', function (e) {
+      var b = e.target.closest('.explorer-row');
+      if (b) { showSplit(Number(b.dataset.i)); sfx('click'); }
+    });
+    document.getElementById('msg-back-btn').addEventListener('click', function () {
+      showExplorer(); sfx('click');
+    });
     rooms.addEventListener('click', function (e) {
       var b = e.target.closest('.side-item');
-      if (b) { sel = Number(b.dataset.i); renderRooms(); replayChat(); }
+      if (b) {
+        sel = Number(b.dataset.i);
+        headTitle.textContent = CHATS[sel].title;
+        curPath.textContent = 'C:\\SYSTEM\\us\\message\\MSG_' + no(sel) + '.bak';
+        renderRooms();
+        replayChat();
+      }
     });
-    renderRooms();
-    replayChat();
+    renderExplorer();
   }
 
   function initWiki() {
@@ -936,7 +1039,7 @@
       }).join('');
       var c = CHARACTERS[cur];
       wiki.innerHTML =
-        "<div class=\"wiki-loaded\">[‘" + esc(c.name) + "’ 의 등록 정보를 불러왔습니다.]</div>" +
+        "<div class=\"wiki-loaded\">['" + esc(c.name) + "' 의 등록 정보를 불러왔습니다.]</div>" +
         '<div class="wiki-top">' +
           '<div class="portrait">' + media(c.portrait, 'PORTRAIT', c.name) + '</div>' +
           '<div class="statbox">' +
